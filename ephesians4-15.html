@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>聖經拼圖 - 以弗所書 4:15</title>
+    <style>
+        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #f0f7ff; margin: 0; min-height: 100vh; }
+        h2 { color: #003366; margin: 10px 0; }
+        .grid-container { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 10px; max-width: 95%; }
+        .slot { width: 45px; height: 45px; border: 2px dashed #00509e; display: flex; align-items: center; justify-content: center; background-color: #e3f2fd; border-radius: 6px; font-weight: bold; }
+        .word { padding: 0 10px; height: 40px; background-color: #003366; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 6px; margin: 4px; touch-action: manipulation; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
+        .hidden { visibility: hidden; }
+        #word-pool { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 20px; max-width: 95%; }
+        #reset-btn { margin-top: 20px; padding: 10px 20px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; }
+        #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
+        .instruction { color: #003366; font-size: 15px; margin-bottom: 15px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+    <h2>以弗所書 4:15</h2>
+    
+    <a href="https://www.youtube.com/shorts/sIXQIqNXbr8" target="_blank" style="text-decoration: none; padding: 10px 20px; background: #FF0000; color: white; border-radius: 5px; font-size: 16px; display: inline-block; margin-bottom: 5px; font-weight: bold; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">🎥 觀看複習影片</a>
+
+    <div class="instruction">請點選下面的字，無須拉動，正確，字會進入格中</div>
+
+    <div id="slots" class="grid-container"></div>
+    <div id="word-pool"></div>
+    <button id="reset-btn" onclick="location.reload()">再玩一次</button>
+
+    <audio id="sound-drop" src="https://actions.google.com/sounds/v1/water/pop.ogg"></audio>
+    <audio id="sound-error" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+    <audio id="sound-cheer" src="https://actions.google.com/sounds/v1/crowds/human_crowd_cheering_short.ogg"></audio>
+
+    <script>
+        const verseArr = ["惟","用","愛","心","說","誠","實","話","，","凡","事","長","進","，","連","於","元","首","基","督","。","以","弗","所","書","4",":","1","5"];
+        let currentSlot = 0;
+
+        const slotsDiv = document.getElementById('slots');
+        const pool = document.getElementById('word-pool');
+
+        verseArr.forEach((char) => {
+            let slot = document.createElement('div');
+            slot.className = 'slot';
+            slot.dataset.answer = char;
+            slotsDiv.appendChild(slot);
+        });
+
+        const shuffled = [...verseArr].sort(() => Math.random() - 0.5);
+        shuffled.forEach((w) => {
+            let div = document.createElement('div');
+            div.className = 'word';
+            div.textContent = w;
+            div.onclick = function() {
+                if (this.textContent === document.querySelectorAll('.slot')[currentSlot].dataset.answer) {
+                    document.querySelectorAll('.slot')[currentSlot].textContent = this.textContent;
+                    this.className = 'hidden';
+                    document.getElementById('sound-drop').play();
+                    currentSlot++;
+                    if (currentSlot === verseArr.length) finish();
+                } else {
+                    document.getElementById('sound-error').play();
+                }
+            };
+            pool.appendChild(div);
+        });
+
+        function finish() {
+            document.getElementById('sound-cheer').play();
+            document.getElementById('reset-btn').style.display = 'block';
+            startConfetti();
+        }
+
+        function startConfetti() {
+            const canvas = document.getElementById("confetti-canvas");
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const ctx = canvas.getContext("2d");
+            let particles = Array.from({length: 100}, () => ({x: Math.random()*canvas.width, y: -10, r: Math.random()*5+2, color: `hsl(${Math.random()*360}, 100%, 50%)`, speed: Math.random()*3+2}));
+            function draw() {
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                particles.forEach(p => { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y+=p.speed, p.r, 0, Math.PI*2); ctx.fill(); if(p.y > canvas.height) p.y = -10; });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+    </script>
+</body>
+</html>
