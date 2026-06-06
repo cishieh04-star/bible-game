@@ -9,43 +9,55 @@
     
     <title>大腦喜歡這樣記神的話</title>
     <style>
-        body { font-family: "Helvetica Neue", Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 500px; margin: auto; background-color: #f4f7f6; }
+        body { font-family: "Helvetica Neue", Arial, sans-serif; line-height: 1.6; padding: 15px; max-width: 600px; margin: auto; background-color: #f4f7f6; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 5px; }
         h2 { color: #5d6d7e; text-align: center; margin-top: 0; font-size: 1.2em; }
-        ul { list-style-type: none; padding: 0; margin: 0 auto; text-align: center; }
+        
+        /* 改用 Grid 布局實現 3 個一行 */
+        ul { 
+            list-style-type: none; 
+            padding: 0; 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            margin-top: 20px;
+        }
         
         li { 
-            margin: 15px 0; 
             background-color: #3498db !important; 
-            border-radius: 10px; 
+            border-radius: 8px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
             border: 2px solid #2980b9; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         a { 
             text-decoration: none; 
             color: #ffffff !important; 
             font-weight: bold; 
-            font-size: 1.2em; 
-            display: block; 
-            padding: 20px; 
+            font-size: 0.9em; /* 因 3 個一行，字體稍微調小以適應空間 */
+            padding: 15px 5px; 
+            text-align: center;
+            display: block;
         }
         
-        a:hover { background-color: #061587 !important; border-radius: 8px; }
+        a:hover { background-color: #061587 !important; border-radius: 6px; }
     </style>
 </head>
 <body>
     <h1>「聖經記憶遊戲」</h1>
     <h2>牢記神的話</h2>
     <ul>
-        <li><a href="psalm118-24.html?v=6">在主裡歡喜(詩篇 118:24)</a></li>
-        <li><a href="ephesians4-15.html?v=6">誠實生活(以弗所書 4:15)</a></li>
-        <li><a href="galatians5-1.html?v=6">基督裡的自由(加拉太書 5:1)</a></li>
-        <li><a href="beatitudes.html?v=6">天國八福(馬太福音 5：3-12)</a></li>
-        <li><a href="Colossians3-9.html?v=6">脫去舊人(歌羅西書 3:9)</a></li>
-        <li><a href="proverbs17-9.html?v=6">包容遮掩(箴言 17:9)</a></li>
-        <li><a href="mark16-20.html?v=6">神蹟跟隨(馬可福音 16:20)</a></li>
-        <li><a href="2 Corinthians5-17.html?v=6">新生命(哥林多後書 5:17)</a></li>
+        <li><a href="psalm118-24.html?v=6">在主裡歡喜<br>(詩篇 118:24)</a></li>
+        <li><a href="ephesians4-15.html?v=6">誠實生活<br>(以弗所書 4:15)</a></li>
+        <li><a href="galatians5-1.html?v=6">基督裡的自由<br>(加拉太書 5:1)</a></li>
+        <li><a href="beatitudes.html?v=6">天國八福<br>(馬太福音 5:3-12)</a></li>
+        <li><a href="Colossians3-9.html?v=6">脫去舊人<br>(歌羅西書 3:9)</a></li>
+        <li><a href="proverbs17-9.html?v=6">包容遮掩<br>(箴言 17:9)</a></li>
+        <li><a href="mark16-20.html?v=6">神蹟跟隨<br>(馬可福音 16:20)</a></li>
+        <li><a href="2 Corinthians5-17.html?v=6">新生命<br>(哥林多後書 5:17)</a></li>
     </ul>
 </body>
 </html>
