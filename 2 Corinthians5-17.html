@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>聖經拼圖 - 哥林多後書 5:17</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; }
+        .full-width { width: 100%; max-width: 600px; text-align: center; }
+        h2 { color: #8b4513; margin: 10px 0; }
+        .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
+        .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
+        .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
+        .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .hidden { visibility: hidden; }
+        .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; margin-bottom: 15px; font-weight: bold; display: inline-block; }
+        .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
+        #reset-btn { margin-top: 20px; padding: 10px 25px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; font-weight: bold; }
+        .explanation { text-align: left; background: #fffdf5; padding: 15px; margin-top: 30px; border: 1px solid #e0d8c0; border-radius: 8px; font-size: 13px; color: #4a3c2e; line-height: 1.5; }
+        .explanation h3 { font-size: 14px; margin-top: 0; color: #8b4513; }
+    </style>
+</head>
+<body>
+
+<div class="full-width">
+    <h2>哥林多後書 5:17</h2>
+    <a href="https://www.youtube.com/shorts/4BZVgYe4Vuw" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+    <div class="instruction">請點選下面的字，正確的字會自動進入格中</div>
+
+    <div id="slots" class="grid-container"></div>
+    <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+    
+    <button id="reset-btn" onclick="location.reload()">再玩一次</button>
+
+    <div class="explanation">
+        <h3>哥林多後書 5:17 說明：</h3>
+        <p><b>若有人在基督裡：</b> 這是一個新生命的起點，指與基督建立連結，成為屬祂的人。</p>
+        <p><b>他就是新造的人：</b> 不只是修補舊生活，而是徹底改變，擁有了全新的身份與生命。</p>
+        <p><b>舊事已過，都變成新的了：</b> 過去的罪債與罪性已經成為過去，我們因信基督而得到了全新的生命與盼望。</p>
+    </div>
+</div>
+
+<script>
+    // 經文內容包含冒號，puncRegex 已包含冒號，將使其留在格子外[cite: 9]
+    const fullText = "若有人在基督裡，他就是新造的人，舊事已過，都變成新的了。（林後5：17）";
+    const puncRegex = /[，。、（）：]/;
+
+    function initGame() {
+        const slotsDiv = document.getElementById('slots');
+        const pool = document.getElementById('word-pool');
+        
+        fullText.split('').forEach((char) => {
+            if (puncRegex.test(char)) {
+                let punc = document.createElement('span');
+                punc.className = 'punctuation';
+                punc.textContent = char;
+                slotsDiv.appendChild(punc);
+            } else {
+                let slot = document.createElement('div');
+                slot.className = 'slot empty-slot';
+                slot.dataset.char = char;
+                slotsDiv.appendChild(slot);
+            }
+        });
+
+        const options = fullText.split('').filter(c => !puncRegex.test(c));
+        options.sort(() => Math.random() - 0.5).forEach(char => {
+            let div = document.createElement('div');
+            div.className = 'word';
+            div.textContent = char;
+            div.onclick = function() {
+                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                if (targetSlot && this.textContent === targetSlot.dataset.char) {
+                    targetSlot.textContent = this.textContent;
+                    targetSlot.id = "filled";
+                    this.className = 'hidden';
+                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
+                }
+            };
+            pool.appendChild(div);
+        });
+    }
+
+    function finish() {
+        const msg = new SpeechSynthesisUtterance("太棒了");
+        msg.lang = 'zh-TW';
+        window.speechSynthesis.speak(msg);
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        document.getElementById('reset-btn').style.display = 'inline-block';
+        document.getElementById('word-pool').style.display = 'none';
+    }
+
+    initGame();
+</script>
+</body>
+</html>
