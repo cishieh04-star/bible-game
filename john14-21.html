@@ -35,7 +35,7 @@
     </div>
     
     <!-- ⚠️請確認您上傳到 GitHub 的聲音檔名是否為 john14-21.mp3，如果不同，請修改這裡的 src -->
-    <audio id="bible-audio" src="john14-21.mp3" preload="auto"></audio>
+    <audio id="bible-game" src="john14-21.mp3" preload="auto"></audio>
 
     <div class="instruction">請點選下面的字，正確的字會自動進入格中</div>
 
@@ -51,7 +51,7 @@
 
     // 乾淨的播放函式
     function playAudio() {
-        const audio = document.getElementById('bible-audio');
+        const audio = document.getElementById('bible-game');
         
         if (!audio.paused) {
             audio.pause();
