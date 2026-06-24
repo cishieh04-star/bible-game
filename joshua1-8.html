@@ -56,7 +56,7 @@
         audio.play().catch(e => console.log("播放錯誤", e));
     }
 
-    // 觀看神的話功能
+    // 觀看神的話功能 (調整為 5 秒)[cite: 5]
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -72,7 +72,7 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000); // 顯示 10 秒
+        }, 5000); // 調整預覽時間為 5 秒[cite: 5]
     }
 
     function initGame() {
@@ -93,8 +93,16 @@
             }
         });
 
+        // 區塊亂序邏輯：每 10 個字為一個區塊[cite: 5]
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        options.sort(() => Math.random() - 0.5).forEach(char => {
+        const blockSize = 10;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
+        }
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
+        blocks.flat().forEach(char => {
             let div = document.createElement('div');
             div.className = 'word';
             div.textContent = char;
@@ -103,7 +111,7 @@
                 if (targetSlot && this.textContent === targetSlot.dataset.char) {
                     targetSlot.textContent = this.textContent;
                     targetSlot.id = "filled";
-                    targetSlot.style.backgroundColor = "#fff"; // 恢復格子顏色
+                    targetSlot.style.backgroundColor = "#fff";
                     this.className = 'hidden';
                     if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
                 }
