@@ -45,7 +45,7 @@
     const fullText = "我已經與基督同釘十字架，現在活著的不再是我，乃是基督在我裡面活著。（加2：20）";
     const puncRegex = /[，。（）：]/;
 
-    // 觀看神的話功能 (10秒預覽)
+    // 調整為 5 秒預覽[cite: 9]
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -61,7 +61,7 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000);
+        }, 5000); 
     }
 
     function initGame() {
@@ -82,8 +82,16 @@
             }
         });
 
+        // 區塊亂序邏輯：每 10 個字為一個區塊[cite: 9]
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        options.sort(() => Math.random() - 0.5).forEach(char => {
+        const blockSize = 10;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
+        }
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
+        blocks.flat().forEach(char => {
             let div = document.createElement('div');
             div.className = 'word';
             div.textContent = char;
