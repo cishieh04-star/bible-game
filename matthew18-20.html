@@ -61,6 +61,7 @@
                 slot.style.backgroundColor = "#e0d0b0";
             }
         });
+        // 將這裡的 10000 修改為 5000[cite: 3]
         setTimeout(() => {
             slots.forEach(slot => {
                 if (slot.id !== "filled") {
@@ -68,7 +69,7 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000);
+        }, 5000);
     }
 
     function initGame() {
