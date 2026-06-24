@@ -46,6 +46,7 @@
     const refTextFull = "（來10：24、25）";
     const puncRegex = /[，。、（）：]/; 
 
+    // 修改處：將顯示時間設定為 5000 毫秒 (5秒)
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -61,7 +62,7 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000);
+        }, 5000); 
     }
 
     function initGame() {
@@ -82,10 +83,8 @@
             }
         });
 
-        // 僅篩選出「非標點」且「非符號」的字元進入選字池
         const options = (verseText + refTextFull).split('').filter(c => !puncRegex.test(c) && c !== '（' && c !== '）');
         
-        // 區塊洗牌邏輯 (blockSize = 10)
         const blockSize = 10;
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
