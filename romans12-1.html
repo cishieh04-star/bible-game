@@ -45,7 +45,7 @@
     const fullText = "所以弟兄們，我以神的慈悲勸你們，將身體獻上，當作活祭，是聖潔的，是神所喜悅的；你們如此事奉，乃是理所當然的。（羅12：1）";
     const puncRegex = /[，。、（）：；]/;
 
-    // 觀看神的話功能 (10秒預覽)
+    // 調整為 5 秒預覽[cite: 6]
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -61,7 +61,7 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000);
+        }, 5000); 
     }
 
     function initGame() {
@@ -82,10 +82,16 @@
             }
         });
 
+        // 區塊亂序邏輯：每 10 個字為一個區塊[cite: 6]
         const characters = fullText.split('').filter(c => !puncRegex.test(c));
-        const shuffled = characters.sort(() => Math.random() - 0.5);
-
-        shuffled.forEach(char => {
+        const blockSize = 10;
+        let blocks = [];
+        for (let i = 0; i < characters.length; i += blockSize) {
+            blocks.push(characters.slice(i, i + blockSize));
+        }
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
+        blocks.flat().forEach(char => {
             let div = document.createElement('div');
             div.className = 'word';
             div.textContent = char;
@@ -101,7 +107,7 @@
 
                 if (targetSlot && this.textContent === targetSlot.dataset.char) {
                     targetSlot.textContent = this.textContent;
-                    targetSlot.style.backgroundColor = "#fff"; // 確保恢復顏色
+                    targetSlot.style.backgroundColor = "#fff";
                     this.className = 'hidden';
                     
                     if (document.querySelectorAll('.empty-slot:empty').length === 0) {
@@ -121,7 +127,7 @@
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-        document.getElementById('reset-btn').style.display = 'inline-block';
+        document.getElementById('reset-btn').style.display = 'block';
         document.getElementById('word-pool').style.display = 'none';
     }
 
