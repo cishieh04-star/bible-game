@@ -45,7 +45,7 @@
     const fullText = "惟用愛心說誠實話，凡事長進，連於元首基督。（以弗所書4:15）";
     const puncRegex = /[，。：]/;
 
-    // 觀看神的話功能 (10秒預覽)
+    // 觀看神的話功能 (調整為 5 秒預覽)[cite: 6]
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -61,7 +61,7 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000); // 顯示 10 秒
+        }, 5000); // 顯示 5 秒[cite: 6]
     }
 
     function initGame() {
@@ -82,8 +82,16 @@
             }
         });
 
+        // 區塊亂序邏輯：每 10 個字為一個區塊[cite: 6]
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        options.sort(() => Math.random() - 0.5).forEach(char => {
+        const blockSize = 10;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
+        }
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
+        blocks.flat().forEach(char => {
             let div = document.createElement('div');
             div.className = 'word';
             div.textContent = char;
@@ -106,7 +114,7 @@
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-        document.getElementById('reset-btn').style.display = 'inline-block';
+        document.getElementById('reset-btn').style.display = 'block';
         document.getElementById('word-pool').style.display = 'none';
     }
 
