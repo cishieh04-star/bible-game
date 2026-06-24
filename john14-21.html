@@ -10,7 +10,6 @@
         .full-width { width: 100%; max-width: 600px; text-align: center; }
         h2 { color: #8b4513; margin: 10px 0; }
         
-        /* 播放按鈕與影片連結的容器設計 */
         .action-container { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
         .audio-btn { padding: 8px 15px; background: #2e7d32; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
@@ -32,7 +31,6 @@
     <div class="action-container">
         <a href="https://www.youtube.com/shorts/_AVoM_edTvQ" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="audio-btn" onclick="playAudio()">🔊 聆聽神的話</button>
-        <!-- 新增觀看神的話按鈕 -->
         <button class="audio-btn" style="background:#5c6bc0;" onclick="showPreview()">📖 觀看神的話</button>
     </div>
     
@@ -59,7 +57,6 @@
         audio.play().catch(e => console.log("播放發生錯誤", e));
     }
 
-    // 觀看神的話功能 (10秒預覽)
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -75,7 +72,7 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000);
+        }, 5000);
     }
 
     function initGame() {
@@ -96,8 +93,16 @@
             }
         });
 
+        // 區塊亂序邏輯：每 10 個字為一個區塊[cite: 5]
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        options.sort(() => Math.random() - 0.5).forEach(char => {
+        const blockSize = 10;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
+        }
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
+        blocks.flat().forEach(char => {
             let div = document.createElement('div');
             div.className = 'word';
             div.textContent = char;
@@ -106,7 +111,7 @@
                 if (targetSlot && this.textContent === targetSlot.dataset.char) {
                     targetSlot.textContent = this.textContent;
                     targetSlot.id = "filled";
-                    targetSlot.style.backgroundColor = "#fff"; // 恢復格子顏色
+                    targetSlot.style.backgroundColor = "#fff";
                     this.className = 'hidden';
                     if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
                 }
