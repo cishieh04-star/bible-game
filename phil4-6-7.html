@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經拼音與拼圖遊戲</title>
+    <title>聖經拼圖 - 羅馬書 1:16</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
@@ -31,10 +31,10 @@
 <div id="timer">時間: 00:00</div>
 
 <div class="full-width">
-    <h2>腓立比書 4:6-7</h2>
+    <h2>羅馬書 1:16</h2>
     
     <div class="action-container">
-        <a href="https://www.youtube.com/shorts/q5pj78ZduAQ" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+        <a href="https://www.youtube.com/shorts/0uu-jm5yTMo" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
 
@@ -47,7 +47,7 @@
 </div>
 
 <script>
-    const fullText = "應當一無掛慮，只要凡事藉著禱告、祈求，和感謝，將你們所要的告訴神。神所賜、出人意外的平安必在基督耶穌裡保守你們的心懷意念。（腓4：6-7）";
+    const fullText = "我不以福音為恥，這福音本是神的大能，要救一切相信的，先是猶太人，後是希利尼人。（羅1：16）";
     const puncRegex = /[\-，。、（）：]/; 
     let poolData = [];
     let timerInterval, seconds = 0, timerStarted = false;
@@ -108,7 +108,7 @@
     function initGame() {
         const slotsDiv = document.getElementById('slots');
         fullText.split('').forEach((char) => {
-            if (puncRegex.test(char) || char === '（' || char === '）') {
+            if (puncRegex.test(char)) {
                 let punc = document.createElement('span');
                 punc.className = 'punctuation';
                 punc.textContent = char;
@@ -121,14 +121,14 @@
             }
         });
 
-        // 簡化遊戲：將文字以 10 個字為一區段進行亂數處理
-        const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== '（' && c !== '）');
+        // 簡化遊戲：將文字以 10 個字為一區段進行亂數處理[cite: 1]
+        const options = fullText.split('').filter(c => !puncRegex.test(c));
         const blockSize = 10;
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             blocks.push(options.slice(i, i + blockSize));
         }
-        // 每 10 個字一組進行洗牌
+        // 每 10 個字一組進行洗牌[cite: 1]
         blocks.forEach(block => block.sort(() => Math.random() - 0.5));
         poolData = blocks.flat();
         renderPool();
