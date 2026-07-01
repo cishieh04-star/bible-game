@@ -34,7 +34,7 @@
         <a href="https://www.youtube.com/shorts/q5pj78ZduAQ" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
-    <div class="instruction">請點選下方的字，填入空格中 (每 5 字為一區段)</div>
+    <div class="instruction">請點選下方的字，填入空格中 (固定順序，5 字為區塊)</div>
     <div id="slots" class="grid-container"></div>
     <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
     
@@ -48,7 +48,6 @@
     const fullText = "應當一無掛慮，只要凡事藉著禱告、祈求，和感謝，將你們所要的告訴神。神所賜、出人意外的平安必在基督耶穌裡保守你們的心懷意念。（腓4：6-7）";
     const puncRegex = /[\-，。、（）：]/; 
     let poolData = [];
-    let blocks = []; // 儲存區段資料
     let timerInterval, seconds = 0, timerStarted = false;
 
     function startTimer() {
@@ -67,6 +66,7 @@
         const filled = document.querySelectorAll('.slot[id="filled"]');
         if (filled.length > 0) {
             const lastSlot = filled[filled.length - 1];
+            // 為了保持順序一致，將字加回陣列末端並重新排序
             poolData.push(lastSlot.dataset.char);
             lastSlot.textContent = "";
             lastSlot.removeAttribute('id');
@@ -96,7 +96,7 @@
     function renderPool() {
         const pool = document.getElementById('word-pool');
         pool.innerHTML = '';
-        // 渲染時直接使用目前 poolData 的順序，確保邏輯一致[cite: 1]
+        // 不再進行隨機洗牌，直接使用初始化時固定的 poolData[cite: 1]
         poolData.forEach((char, index) => {
             let div = document.createElement('div');
             div.className = 'word';
@@ -135,11 +135,11 @@
 
         const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== '（' && c !== '）');
         const blockSize = 5; 
-        
-        // 建立區段並在區段內亂數[cite: 1]
+        let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             let chunk = options.slice(i, i + blockSize);
-            chunk.sort(() => Math.random() - 0.5); // 區塊內亂數[cite: 1]
+            // 這裡進行固定排序，讓每次重整時，區塊內部的順序都保持一樣[cite: 1]
+            chunk.sort((a, b) => (a.charCodeAt(0) % 2) - (b.charCodeAt(0) % 2));
             blocks.push(...chunk);
         }
         poolData = blocks;
