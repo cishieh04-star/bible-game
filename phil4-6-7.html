@@ -121,9 +121,16 @@
             }
         });
 
+        // 簡化遊戲：將文字以 10 個字為一區段進行亂數處理
         const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== '（' && c !== '）');
-        options.sort(() => Math.random() - 0.5);
-        poolData = options;
+        const blockSize = 10;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
+        }
+        // 每 10 個字一組進行洗牌
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        poolData = blocks.flat();
         renderPool();
     }
 
