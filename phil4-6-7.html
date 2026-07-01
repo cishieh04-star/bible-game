@@ -23,7 +23,12 @@
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
-        #reset-btn { margin-top: 20px; padding: 10px 25px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; font-weight: bold; }
+        
+        /* 更正按鍵樣式 */
+        .control-btns { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
+        .btn-action { padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        #undo-btn { background: #f39c12; color: white; }
+        #reset-btn { background: #ff5722; color: white; display: none; }
     </style>
 </head>
 <body>
@@ -38,20 +43,21 @@
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
 
-    <div class="instruction">請點選下方的字，填入空格中</div>
+    <div class="instruction">請點選下方的字，填入空格中 (每 5 字為一組)</div>
 
     <div id="slots" class="grid-container"></div>
     <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
     
-    <button id="reset-btn" onclick="location.reload()">再玩一次</button>
+    <div class="control-btns">
+        <button id="undo-btn" class="btn-action" onclick="undoLast()">⟲ 更正</button>
+        <button id="reset-btn" class="btn-action" onclick="location.reload()">再玩一次</button>
+    </div>
 </div>
 
 <script>
-    // 修正連字號處理問題
     const fullText = "應當一無掛慮，只要凡事藉著禱告、祈求，和感謝，將你們所要的告訴神。神所賜、出人意外的平安必在基督耶穌裡保守你們的心懷意念。（腓4：6-7）";
     const puncRegex = /[\-，。、（）：]/; 
     let poolData = [];
-    
     let timerInterval, seconds = 0, timerStarted = false;
 
     function startTimer() {
@@ -63,6 +69,19 @@
                 let s = seconds % 60;
                 document.getElementById('timer').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }, 1000);
+        }
+    }
+
+    // 更正功能：將最後填入的字放回 poolData
+    function undoLast() {
+        const filled = document.querySelectorAll('.slot[id="filled"]');
+        if (filled.length > 0) {
+            const lastSlot = filled[filled.length - 1];
+            poolData.push(lastSlot.dataset.char);
+            lastSlot.textContent = "";
+            lastSlot.removeAttribute('id');
+            lastSlot.style.backgroundColor = "#fff";
+            renderPool();
         }
     }
 
@@ -87,6 +106,7 @@
     function renderPool() {
         const pool = document.getElementById('word-pool');
         pool.innerHTML = '';
+        poolData.sort(() => Math.random() - 0.5); // 重新洗牌
         poolData.forEach((char, index) => {
             let div = document.createElement('div');
             div.className = 'word';
@@ -123,8 +143,9 @@
             }
         });
 
+        // 簡化遊戲：將文字以 5 個字為一區段進行亂數處理[cite: 1]
         const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== '（' && c !== '）');
-        const blockSize = 10;
+        const blockSize = 5; // 難度降低：縮小為 5 字區塊[cite: 1]
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             blocks.push(options.slice(i, i + blockSize));
@@ -136,13 +157,13 @@
 
     function finish() {
         clearInterval(timerInterval);
-        // 使用者互動觸發語音，確保 iOS 兼容
         const msg = new SpeechSynthesisUtterance("太棒了");
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
         
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
         document.getElementById('reset-btn').style.display = 'inline-block';
+        document.getElementById('undo-btn').style.display = 'none'; // 完成後隱藏更正鍵
         document.getElementById('word-pool').style.display = 'none';
     }
 
