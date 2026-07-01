@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經拼圖 - 腓立比書 4:6-7</title>
+    <title>聖經拼音與拼圖遊戲</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
@@ -47,11 +47,9 @@
 </div>
 
 <script>
-    // 修正連字號處理問題
     const fullText = "應當一無掛慮，只要凡事藉著禱告、祈求，和感謝，將你們所要的告訴神。神所賜、出人意外的平安必在基督耶穌裡保守你們的心懷意念。（腓4：6-7）";
     const puncRegex = /[\-，。、（）：]/; 
     let poolData = [];
-    
     let timerInterval, seconds = 0, timerStarted = false;
 
     function startTimer() {
@@ -124,19 +122,13 @@
         });
 
         const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== '（' && c !== '）');
-        const blockSize = 10;
-        let blocks = [];
-        for (let i = 0; i < options.length; i += blockSize) {
-            blocks.push(options.slice(i, i + blockSize));
-        }
-        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
-        poolData = blocks.flat();
+        options.sort(() => Math.random() - 0.5);
+        poolData = options;
         renderPool();
     }
 
     function finish() {
         clearInterval(timerInterval);
-        // 使用者互動觸發語音，確保 iOS 兼容
         const msg = new SpeechSynthesisUtterance("太棒了");
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
