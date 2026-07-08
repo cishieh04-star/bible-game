@@ -9,7 +9,7 @@
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; }
         #page-wrapper { width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; }
         #timer-container { position: fixed; top: 10px; right: 10px; z-index: 9999; }
-        #timer { font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 5px; border: 1px solid #8b4513; }
+        #timer { font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 5px; border: 1px solid #8b4513; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h2 { color: #8b4513; margin: 10px 0; }
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
         .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
@@ -35,7 +35,9 @@
     let poolData = [];
     let timerInterval, seconds = 0, timerStarted = false;
 
-    // 自定義亂數生成器（確保每次再玩一次時，順序完全一樣）
+    // 確保 SpeechSynthesis 預載入
+    window.speechSynthesis.getVoices();
+
     function seededShuffle(array, seed) {
         let m = array.length, t, i;
         while (m) {
@@ -55,6 +57,14 @@
                 document.getElementById('timer').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }, 1000);
         }
+    }
+
+    function playSuccessSound() {
+        // 在 iOS 裝置上，必須在互動函式內建立並執行
+        const msg = new SpeechSynthesisUtterance("太棒了");
+        msg.lang = 'zh-TW';
+        msg.rate = 1.0;
+        window.speechSynthesis.speak(msg);
     }
 
     function renderPool() {
@@ -101,7 +111,6 @@
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             let chunk = options.slice(i, i + blockSize);
-            // 使用固定的 seed 進行洗牌，確保「再玩一次」順序一致
             seededShuffle(chunk, 0.123); 
             blocks.push(...chunk);
         }
@@ -111,6 +120,7 @@
 
     function finish() {
         clearInterval(timerInterval);
+        playSuccessSound(); // 確保聲音從點擊觸發的流程執行
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         document.getElementById('reset-btn').style.display = 'inline-block';
         document.getElementById('word-pool').style.display = 'none';
