@@ -6,11 +6,15 @@
     <title>聖經拼圖 - 羅馬書 1:16</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
-        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 50px; }
+        /* 確保 body 填滿且不干擾定位 */
+        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; }
         
-        /* 碼錶樣式：固定在右上方，並與標題保持距離 */
-        #timer { position: fixed; top: 10px; right: 10px; font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; z-index: 1000; border: 1px solid #8b4513; }
+        /* 使用 wrapper 包含所有內容，確保計時器獨立於內容流 */
+        #page-wrapper { width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* 將計時器改為固定在螢幕上方，並確保高層級 */
+        #timer-container { position: fixed; top: 10px; right: 10px; z-index: 9999; }
+        #timer { font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 5px; border: 1px solid #8b4513; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
         h2 { color: #8b4513; margin: 10px 0; }
         
@@ -29,9 +33,11 @@
 </head>
 <body>
 
-<div id="timer">時間: 00:00</div>
+<div id="timer-container">
+    <div id="timer">時間: 00:00</div>
+</div>
 
-<div class="full-width">
+<div id="page-wrapper">
     <h2>羅馬書 1:16</h2>
     
     <div class="action-container">
@@ -122,14 +128,12 @@
             }
         });
 
-        // 簡化遊戲：將文字以 10 個字為一區段進行亂數處理
         const options = fullText.split('').filter(c => !puncRegex.test(c));
         const blockSize = 10;
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             blocks.push(options.slice(i, i + blockSize));
         }
-        // 每 10 個字一組進行洗牌
         blocks.forEach(block => block.sort(() => Math.random() - 0.5));
         poolData = blocks.flat();
         renderPool();
