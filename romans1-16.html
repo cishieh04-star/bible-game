@@ -6,50 +6,26 @@
     <title>聖經拼圖 - 羅馬書 1:16</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* 確保 body 填滿且不干擾定位 */
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; }
-        
-        /* 使用 wrapper 包含所有內容，確保計時器獨立於內容流 */
         #page-wrapper { width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* 將計時器改為固定在螢幕上方，並確保高層級 */
         #timer-container { position: fixed; top: 10px; right: 10px; z-index: 9999; }
-        #timer { font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 5px; border: 1px solid #8b4513; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        
+        #timer { font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 5px; border: 1px solid #8b4513; }
         h2 { color: #8b4513; margin: 10px 0; }
-        
-        .action-container { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
-        .preview-btn { padding: 8px 15px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
         .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
-        
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
         #reset-btn { margin-top: 20px; padding: 10px 25px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="timer-container">
-    <div id="timer">時間: 00:00</div>
-</div>
+<div id="timer-container"><div id="timer">時間: 00:00</div></div>
 
 <div id="page-wrapper">
     <h2>羅馬書 1:16</h2>
-    
-    <div class="action-container">
-        <a href="https://www.youtube.com/shorts/0uu-jm5yTMo" target="_blank" class="yt-link">🎥 觀看複習影片</a>
-        <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
-    </div>
-
-    <div class="instruction">請點選下方的字，填入空格中</div>
-
     <div id="slots" class="grid-container"></div>
     <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
-    
     <button id="reset-btn" onclick="location.reload()">再玩一次</button>
 </div>
 
@@ -58,6 +34,16 @@
     const puncRegex = /[\-，。、（）：]/; 
     let poolData = [];
     let timerInterval, seconds = 0, timerStarted = false;
+
+    // 自定義亂數生成器（確保每次再玩一次時，順序完全一樣）
+    function seededShuffle(array, seed) {
+        let m = array.length, t, i;
+        while (m) {
+            i = Math.floor(seed * m--);
+            t = array[m]; array[m] = array[i]; array[i] = t;
+        }
+        return array;
+    }
 
     function startTimer() {
         if (!timerStarted) {
@@ -69,24 +55,6 @@
                 document.getElementById('timer').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }, 1000);
         }
-    }
-
-    function showPreview() {
-        const slots = document.querySelectorAll('.empty-slot');
-        slots.forEach(slot => {
-            if (slot.id !== "filled") {
-                slot.textContent = slot.dataset.char;
-                slot.style.backgroundColor = "#e0d0b0";
-            }
-        });
-        setTimeout(() => {
-            slots.forEach(slot => {
-                if (slot.id !== "filled") {
-                    slot.textContent = "";
-                    slot.style.backgroundColor = "#fff";
-                }
-            });
-        }, 3000); 
     }
 
     function renderPool() {
@@ -115,7 +83,7 @@
     function initGame() {
         const slotsDiv = document.getElementById('slots');
         fullText.split('').forEach((char) => {
-            if (puncRegex.test(char)) {
+            if (puncRegex.test(char) || char === '（' || char === '）') {
                 let punc = document.createElement('span');
                 punc.className = 'punctuation';
                 punc.textContent = char;
@@ -128,24 +96,22 @@
             }
         });
 
-        const options = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 10;
+        const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== '（' && c !== '）');
+        const blockSize = 5; 
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
-            blocks.push(options.slice(i, i + blockSize));
+            let chunk = options.slice(i, i + blockSize);
+            // 使用固定的 seed 進行洗牌，確保「再玩一次」順序一致
+            seededShuffle(chunk, 0.123); 
+            blocks.push(...chunk);
         }
-        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
-        poolData = blocks.flat();
+        poolData = blocks;
         renderPool();
     }
 
     function finish() {
         clearInterval(timerInterval);
-        const msg = new SpeechSynthesisUtterance("太棒了");
-        msg.lang = 'zh-TW';
-        window.speechSynthesis.speak(msg);
-        
-        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         document.getElementById('reset-btn').style.display = 'inline-block';
         document.getElementById('word-pool').style.display = 'none';
     }
