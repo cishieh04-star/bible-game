@@ -7,8 +7,11 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; }
-        .full-width { width: 100%; max-width: 600px; text-align: center; }
+        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 30px; }
         h2 { color: #8b4513; margin: 10px 0; }
+        
+        /* 固定計時器樣式 */
+        #timer { position: fixed; top: 10px; right: 10px; font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; z-index: 1000; border: 1px solid #8b4513; }
         
         .action-container { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
@@ -18,12 +21,13 @@
         .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; cursor: default; }
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); transition: background-color 0.2s; }
-        .hidden { visibility: hidden; }
         .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
         #reset-btn { margin-top: 20px; padding: 10px 25px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
+
+<div id="timer">時間: 00:00</div>
 
 <div class="full-width">
     <h2>羅馬書 12:1</h2>
@@ -44,8 +48,21 @@
 <script>
     const fullText = "所以弟兄們，我以神的慈悲勸你們，將身體獻上，當作活祭，是聖潔的，是神所喜悅的；你們如此事奉，乃是理所當然的。（羅12：1）";
     const puncRegex = /[，。、（）：；]/;
+    let timerInterval, seconds = 0, timerStarted = false;
+    let poolData = [];
 
-    // 調整為 5 秒預覽[cite: 6]
+    function startTimer() {
+        if (!timerStarted) {
+            timerStarted = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                let m = Math.floor(seconds / 60);
+                let s = seconds % 60;
+                document.getElementById('timer').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+    }
+
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -64,9 +81,34 @@
         }, 5000); 
     }
 
+    // 重新渲染選字池以達到「合攏」效果
+    function renderPool() {
+        const pool = document.getElementById('word-pool');
+        pool.innerHTML = '';
+        poolData.forEach((char, index) => {
+            let div = document.createElement('div');
+            div.className = 'word';
+            div.textContent = char;
+            div.onclick = function() {
+                startTimer();
+                let targetSlot = document.querySelector('.empty-slot:empty');
+                if (targetSlot && this.textContent === targetSlot.dataset.char) {
+                    targetSlot.textContent = this.textContent;
+                    targetSlot.style.backgroundColor = "#fff";
+                    poolData.splice(index, 1);
+                    renderPool(); // 移除後重新渲染
+                    if (document.querySelectorAll('.empty-slot:empty').length === 0) finish();
+                } else {
+                    this.style.backgroundColor = "#d32f2f";
+                    setTimeout(() => { this.style.backgroundColor = "#8b4513"; }, 200);
+                }
+            };
+            pool.appendChild(div);
+        });
+    }
+
     function initGame() {
         const slotsDiv = document.getElementById('slots');
-        const pool = document.getElementById('word-pool');
         
         fullText.split('').forEach((char) => {
             if (puncRegex.test(char)) {
@@ -82,47 +124,21 @@
             }
         });
 
-        // 區塊亂序邏輯：每 10 個字為一個區塊[cite: 6]
+        // 邏輯：每 5 個字一區塊，區塊內亂數
         const characters = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 10;
+        const blockSize = 5;
         let blocks = [];
         for (let i = 0; i < characters.length; i += blockSize) {
             blocks.push(characters.slice(i, i + blockSize));
         }
         blocks.forEach(block => block.sort(() => Math.random() - 0.5));
         
-        blocks.flat().forEach(char => {
-            let div = document.createElement('div');
-            div.className = 'word';
-            div.textContent = char;
-            div.onclick = function() {
-                let emptySlots = document.querySelectorAll('.empty-slot');
-                let targetSlot = null;
-                for (let s of emptySlots) {
-                    if (s.textContent === "") {
-                        targetSlot = s;
-                        break;
-                    }
-                }
-
-                if (targetSlot && this.textContent === targetSlot.dataset.char) {
-                    targetSlot.textContent = this.textContent;
-                    targetSlot.style.backgroundColor = "#fff";
-                    this.className = 'hidden';
-                    
-                    if (document.querySelectorAll('.empty-slot:empty').length === 0) {
-                        finish();
-                    }
-                } else {
-                    this.style.backgroundColor = "#d32f2f";
-                    setTimeout(() => { this.style.backgroundColor = "#8b4513"; }, 200);
-                }
-            };
-            pool.appendChild(div);
-        });
+        poolData = blocks.flat();
+        renderPool();
     }
 
     function finish() {
+        clearInterval(timerInterval);
         const msg = new SpeechSynthesisUtterance("太棒了");
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
