@@ -82,6 +82,7 @@
         }, 3000); 
     }
 
+    // 重新渲染選字池以實現自動合攏
     function renderPool() {
         const pool = document.getElementById('word-pool');
         pool.innerHTML = '';
@@ -96,8 +97,11 @@
                     targetSlot.textContent = this.textContent;
                     targetSlot.id = "filled";
                     targetSlot.style.backgroundColor = "#fff";
+                    
+                    // 從陣列中移除已選的字，並重新渲染以合攏
                     poolData.splice(index, 1); 
                     renderPool(); 
+                    
                     if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
                 }
             };
@@ -121,15 +125,15 @@
             }
         });
 
-        // 簡化遊戲：將文字以 10 個字為一區段進行亂數處理
+        // 邏輯：每 5 個字為一個區塊，區塊內亂數處理
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 10;
+        const blockSize = 5;
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             blocks.push(options.slice(i, i + blockSize));
         }
-        // 每 10 個字一組進行洗牌
         blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
         poolData = blocks.flat();
         renderPool();
     }
