@@ -7,20 +7,20 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
-        .full-width { width: 100%; max-width: 600px; text-align: center; }
+        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 50px; }
         
-        /* 右上角計時器樣式 */
+        /* 固定計時器：右上角，不遮蓋標題 */
         #timer-display { position: fixed; top: 15px; right: 15px; font-size: 18px; font-weight: bold; color: #d32f2f; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 8px; border: 2px solid #8b4513; z-index: 100; }
         
         h2 { color: #8b4513; margin: 10px 0; }
         .action-container { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
-        .audio-btn { padding: 8px 15px; background: #2e7d32; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .action-btn { padding: 8px 15px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
         .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         
-        /* 選字池樣式 */
         #word-pool { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; gap: 6px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         
@@ -37,11 +37,8 @@
     
     <div class="action-container">
         <a href="https://www.youtube.com/shorts/b0L_yuaFNR4" target="_blank" class="yt-link">🎥 觀看複習影片</a>
-        <button class="audio-btn" onclick="playAudio()">🔊 聆聽經文</button>
-        <button class="audio-btn" style="background:#5c6bc0;" onclick="showPreview()">📖 觀看神的話</button>
+        <button class="action-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
-    
-    <audio id="bible-audio" src="matthew18-20.mp3" preload="auto"></audio>
 
     <div class="instruction">請點選下方的字，填入空格中</div>
 
@@ -55,10 +52,7 @@
     const fullText = "因為無論在哪裡，有兩三個人奉我的名聚會，那裡就有我在他們中間。（太18：20）";
     const puncRegex = /[，。、（）：]/;
     let poolData = [];
-
-    let timerInterval;
-    let seconds = 0;
-    let timerStarted = false;
+    let timerInterval, seconds = 0, timerStarted = false;
 
     function startTimer() {
         if (!timerStarted) {
@@ -70,13 +64,6 @@
                 document.getElementById('timer-display').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }, 1000);
         }
-    }
-
-    function playAudio() {
-        const audio = document.getElementById('bible-audio');
-        audio.volume = 1.0;
-        if (!audio.paused) { audio.pause(); audio.currentTime = 0; }
-        audio.play().catch(e => console.log("播放錯誤", e));
     }
 
     function showPreview() {
@@ -97,7 +84,6 @@
         }, 5000);
     }
 
-    // 重新渲染選字池以達成聚合效果
     function renderPool() {
         const pool = document.getElementById('word-pool');
         pool.innerHTML = '';
@@ -111,9 +97,9 @@
                 if (targetSlot && this.textContent === targetSlot.dataset.char) {
                     targetSlot.textContent = this.textContent;
                     targetSlot.id = "filled";
-                    targetSlot.style.backgroundColor = "#fff"; 
-                    poolData.splice(index, 1); // 從陣列中移除已選字元
-                    renderPool(); // 重新渲染選字池，達成自動聚合
+                    targetSlot.style.backgroundColor = "#fff";
+                    poolData.splice(index, 1);
+                    renderPool(); // 重新渲染實現合攏
                     if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
                 }
             };
@@ -138,14 +124,15 @@
             }
         });
 
-        // 區塊亂序邏輯：每 10 個字為一個區塊
+        // 邏輯：每 5 個字為一區塊，區塊內隨機
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 10;
+        const blockSize = 5;
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             blocks.push(options.slice(i, i + blockSize));
         }
         blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
         poolData = blocks.flat();
         renderPool();
     }
@@ -156,7 +143,7 @@
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-        document.getElementById('reset-btn').style.display = 'inline-block';
+        document.getElementById('reset-btn').style.display = 'block';
         document.getElementById('word-pool').style.display = 'none';
     }
 
