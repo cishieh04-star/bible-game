@@ -6,38 +6,38 @@
     <title>聖經拼圖 - 提摩太後書 3:16</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; }
-        .full-width { width: 100%; max-width: 600px; text-align: center; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
+        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 50px; }
         h2 { color: #8b4513; margin: 10px 0; }
+        
+        /* 固定計時器：右上角，不遮蓋標題 */
+        #timer { position: fixed; top: 10px; right: 10px; font-size: 16px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.9); padding: 5px 10px; border-radius: 5px; z-index: 1000; border: 1px solid #8b4513; }
         
         .action-container { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
-        .audio-btn { padding: 8px 15px; background: #2e7d32; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .audio-btn { padding: 8px 15px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
         
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
         .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .hidden { visibility: hidden; }
         .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
         #reset-btn { margin-top: 20px; padding: 10px 25px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
+<div id="timer">時間: 00:00</div>
+
 <div class="full-width">
     <h2>提摩太後書 3:16</h2>
     
     <div class="action-container">
         <a href="https://www.youtube.com/shorts/xBLKrx7It2w" target="_blank" class="yt-link">🎥 觀看複習影片</a>
-        <button class="audio-btn" onclick="playAudio()">🔊 聆聽神的話</button>
-        <!-- 新增觀看神的話按鈕 -->
-        <button class="audio-btn" style="background:#5c6bc0;" onclick="showPreview()">📖 觀看神的話</button>
+        <button class="audio-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
     
-    <audio id="bible-audio" src="2_timothy3-16.mp3" preload="auto"></audio>
-
-    <div class="instruction">請點選下面的字，正確的字會自動進入格中</div>
+    <div class="instruction">請點選下方的字，填入空格中</div>
 
     <div id="slots" class="grid-container"></div>
     <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
@@ -48,17 +48,21 @@
 <script>
     const fullText = "聖經都是神所默示的，於教訓、督責、使人歸正、教導人學義都是有益的。（提後3:16）";
     const puncRegex = /[，、。（）：]/;
+    let poolData = [];
+    let timerInterval, seconds = 0, timerStarted = false;
 
-    function playAudio() {
-        const audio = document.getElementById('bible-audio');
-        if (!audio.paused) {
-            audio.pause();
-            audio.currentTime = 0;
+    function startTimer() {
+        if (!timerStarted) {
+            timerStarted = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                let m = Math.floor(seconds / 60);
+                let s = seconds % 60;
+                document.getElementById('timer').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
         }
-        audio.play().catch(e => console.log("播放發生錯誤", e));
     }
 
-    // 觀看神的話功能 (10秒預覽)
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -74,12 +78,34 @@
                     slot.style.backgroundColor = "#fff";
                 }
             });
-        }, 10000); // 顯示 10 秒
+        }, 10000);
+    }
+
+    function renderPool() {
+        const pool = document.getElementById('word-pool');
+        pool.innerHTML = '';
+        poolData.forEach((char, index) => {
+            let div = document.createElement('div');
+            div.className = 'word';
+            div.textContent = char;
+            div.onclick = function() {
+                startTimer();
+                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                if (targetSlot && this.textContent === targetSlot.dataset.char) {
+                    targetSlot.textContent = this.textContent;
+                    targetSlot.id = "filled";
+                    targetSlot.style.backgroundColor = "#fff";
+                    poolData.splice(index, 1);
+                    renderPool(); // 重新渲染以實現合攏
+                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
+                }
+            };
+            pool.appendChild(div);
+        });
     }
 
     function initGame() {
         const slotsDiv = document.getElementById('slots');
-        const pool = document.getElementById('word-pool');
         
         fullText.split('').forEach((char) => {
             if (puncRegex.test(char)) {
@@ -95,26 +121,21 @@
             }
         });
 
+        // 邏輯：每 5 個字為一區塊，區塊內亂數
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        options.sort(() => Math.random() - 0.5).forEach(char => {
-            let div = document.createElement('div');
-            div.className = 'word';
-            div.textContent = char;
-            div.onclick = function() {
-                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
-                if (targetSlot && this.textContent === targetSlot.dataset.char) {
-                    targetSlot.textContent = this.textContent;
-                    targetSlot.id = "filled";
-                    targetSlot.style.backgroundColor = "#fff"; // 恢復格子顏色
-                    this.className = 'hidden';
-                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
-                }
-            };
-            pool.appendChild(div);
-        });
+        const blockSize = 5;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
+        }
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        
+        poolData = blocks.flat();
+        renderPool();
     }
 
     function finish() {
+        clearInterval(timerInterval);
         const msg = new SpeechSynthesisUtterance("太棒了");
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
