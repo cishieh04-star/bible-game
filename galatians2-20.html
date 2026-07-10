@@ -18,7 +18,6 @@
         .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .hidden { visibility: hidden; }
         .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
         #reset-btn { margin-top: 20px; padding: 10px 25px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; font-weight: bold; }
     </style>
@@ -33,7 +32,7 @@
         <button class="audio-btn" style="background:#5c6bc0;" onclick="showPreview()">📖 觀看神的話</button>
     </div>
     
-    <div class="instruction">請點選下面的字，正確的字會自動進入格中</div>
+    <div class="instruction">請點選下方的字，填入空格中</div>
 
     <div id="slots" class="grid-container"></div>
     <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
@@ -44,8 +43,8 @@
 <script>
     const fullText = "我已經與基督同釘十字架，現在活著的不再是我，乃是基督在我裡面活著。（加2：20）";
     const puncRegex = /[，。（）：]/;
+    let poolData = [];
 
-    // 調整為 5 秒預覽[cite: 9]
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
         slots.forEach(slot => {
@@ -64,9 +63,30 @@
         }, 5000); 
     }
 
+    function renderPool() {
+        const pool = document.getElementById('word-pool');
+        pool.innerHTML = '';
+        poolData.forEach((char, index) => {
+            let div = document.createElement('div');
+            div.className = 'word';
+            div.textContent = char;
+            div.onclick = function() {
+                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                if (targetSlot && this.textContent === targetSlot.dataset.char) {
+                    targetSlot.textContent = this.textContent;
+                    targetSlot.id = "filled";
+                    targetSlot.style.backgroundColor = "#fff";
+                    poolData.splice(index, 1); 
+                    renderPool(); 
+                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
+                }
+            };
+            pool.appendChild(div);
+        });
+    }
+
     function initGame() {
         const slotsDiv = document.getElementById('slots');
-        const pool = document.getElementById('word-pool');
         
         fullText.split('').forEach((char) => {
             if (puncRegex.test(char)) {
@@ -82,31 +102,17 @@
             }
         });
 
-        // 區塊亂序邏輯：每 10 個字為一個區塊[cite: 9]
+        // 區塊亂序邏輯：每 5 個字為一個區塊
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 10;
+        const blockSize = 5;
         let blocks = [];
         for (let i = 0; i < options.length; i += blockSize) {
             blocks.push(options.slice(i, i + blockSize));
         }
         blocks.forEach(block => block.sort(() => Math.random() - 0.5));
         
-        blocks.flat().forEach(char => {
-            let div = document.createElement('div');
-            div.className = 'word';
-            div.textContent = char;
-            div.onclick = function() {
-                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
-                if (targetSlot && this.textContent === targetSlot.dataset.char) {
-                    targetSlot.textContent = this.textContent;
-                    targetSlot.id = "filled";
-                    targetSlot.style.backgroundColor = "#fff";
-                    this.className = 'hidden';
-                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
-                }
-            };
-            pool.appendChild(div);
-        });
+        poolData = blocks.flat();
+        renderPool();
     }
 
     function finish() {
