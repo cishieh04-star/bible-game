@@ -4,99 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>聖經拼圖 - 加拉太書 5:1</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #f0f7ff; margin: 0; min-height: 100vh; }
-        h2 { color: #003366; margin: 10px 0; }
-        .grid-container { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 10px; max-width: 95%; }
-        .slot { width: 45px; height: 45px; border: 2px dashed #00509e; display: flex; align-items: center; justify-content: center; background-color: #e3f2fd; border-radius: 6px; font-weight: bold; }
-        /* 固定顯示標點符號的樣式 */
-        .fixed { border: none; background: transparent; }
-        .word { padding: 0 10px; height: 40px; background-color: #003366; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 6px; margin: 4px; touch-action: manipulation; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
-        .hidden { visibility: hidden; }
-        #word-pool { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 20px; max-width: 95%; }
-        #reset-btn { margin-top: 20px; padding: 10px 20px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; }
-        #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
-        .instruction { color: #003366; font-size: 15px; margin-bottom: 15px; font-weight: bold; text-align: center; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
+        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 50px; }
+        
+        /* 固定計時器：右上角，不遮蓋標題 */
+        #timer { position: fixed; top: 10px; right: 10px; font-size: 18px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; z-index: 1000; border: 1px solid #8b4513; }
+        
+        h2 { color: #8b4513; margin: 10px 0; }
+        
+        .action-container { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
+        .preview-btn { padding: 8px 15px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        
+        .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
+        .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
+        
+        .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
+        .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
+        
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .action-btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        #undo-btn { background: #f39c12; color: white; }
+        #reset-btn { background: #ff5722; color: white; display: none; }
     </style>
 </head>
 <body>
 
-    <canvas id="confetti-canvas"></canvas>
+<div id="timer">時間: 00:00</div>
+
+<div class="full-width">
     <h2>加拉太書 5:1</h2>
     
-    <a href="https://www.youtube.com/shorts/R_XeblBYaTo" target="_blank" style="text-decoration: none; padding: 10px 20px; background: #FF0000; color: white; border-radius: 5px; font-size: 16px; display: inline-block; margin-bottom: 5px; font-weight: bold; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">🎥 觀看複習影片</a>
+    <div class="action-container">
+        <a href="https://www.youtube.com/shorts/z7R4P9D1jRo" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+        <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
+    </div>
 
-    <div class="instruction">請點選下面的字，填入空格中</div>
+    <div class="instruction">請點選下方的字，填入空格中</div>
 
     <div id="slots" class="grid-container"></div>
-    <div id="word-pool"></div>
-    <button id="reset-btn" onclick="location.reload()">再玩一次</button>
+    <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+    
+    <div class="btn-group">
+        <button id="undo-btn" class="action-btn" onclick="undoLast()">⟲ 更正</button>
+        <button id="reset-btn" class="action-btn" onclick="location.reload()">再玩一次</button>
+    </div>
+</div>
 
-    <audio id="sound-drop" src="https://actions.google.com/sounds/v1/water/pop.ogg"></audio>
-    <audio id="sound-error" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-    <audio id="sound-cheer" src="https://actions.google.com/sounds/v1/crowds/human_crowd_cheering_short.ogg"></audio>
+<script>
+    const fullText = "基督釋放了我們，叫我們得以自由。所以要站立得穩，不要再被奴僕的軛挾制。（加5:1）";
+    const puncRegex = /[\-，。、（）：]/; 
+    let poolData = [];
+    let timerInterval, seconds = 0, timerStarted = false;
 
-    <script>
-        const verseArr = ["基","督","釋","放","了","我","們","，","叫","我","們","得","以","自","由","，","所","以","要","站","立","得","穩","。","加","拉","太","書","5",":","1"];
-        const punctuations = ["，", "。", ":"];
-        let currentSlotIndex = 0;
+    function startTimer() {
+        if (!timerStarted) {
+            timerStarted = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                let m = Math.floor(seconds / 60);
+                let s = seconds % 60;
+                document.getElementById('timer').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+    }
 
-        const slotsDiv = document.getElementById('slots');
-        const pool = document.getElementById('word-pool');
+    function undoLast() {
+        const filled = document.querySelectorAll('.slot[id="filled"]');
+        if (filled.length > 0) {
+            const lastSlot = filled[filled.length - 1];
+            poolData.push(lastSlot.dataset.char);
+            lastSlot.textContent = "";
+            lastSlot.removeAttribute('id');
+            lastSlot.style.backgroundColor = "#fff";
+            renderPool();
+        }
+    }
 
-        // 建立格子，標點符號直接顯示並固定[cite: 10]
-        verseArr.forEach((char) => {
-            let slot = document.createElement('div');
-            slot.className = 'slot';
-            if (punctuations.includes(char)) {
-                slot.textContent = char;
-                slot.classList.add('fixed');
-            } else {
-                slot.dataset.answer = char;
+    function showPreview() {
+        const slots = document.querySelectorAll('.empty-slot');
+        slots.forEach(slot => {
+            if (slot.id !== "filled") {
+                slot.textContent = slot.dataset.char;
+                slot.style.backgroundColor = "#e0d0b0";
             }
-            slotsDiv.appendChild(slot);
         });
+        setTimeout(() => {
+            slots.forEach(slot => {
+                if (slot.id !== "filled") {
+                    slot.textContent = "";
+                    slot.style.backgroundColor = "#fff";
+                }
+            });
+        }, 5000); 
+    }
 
-        const allSlots = document.querySelectorAll('.slot:not(.fixed)');
-        // 過濾掉標點符號，建立文字庫[cite: 10]
-        const shuffled = [...verseArr].filter(c => !punctuations.includes(c)).sort(() => Math.random() - 0.5);
-        
-        shuffled.forEach((w) => {
+    function renderPool() {
+        const pool = document.getElementById('word-pool');
+        pool.innerHTML = '';
+        poolData.forEach((char, index) => {
             let div = document.createElement('div');
             div.className = 'word';
-            div.textContent = w;
+            div.textContent = char;
             div.onclick = function() {
-                if (currentSlotIndex < allSlots.length && this.textContent === allSlots[currentSlotIndex].dataset.answer) {
-                    allSlots[currentSlotIndex].textContent = this.textContent;
-                    this.className = 'hidden';
-                    document.getElementById('sound-drop').play(); 
-                    currentSlotIndex++;
-                    if (currentSlotIndex === allSlots.length) finish();
-                } else {
-                    document.getElementById('sound-error').play(); 
+                startTimer();
+                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                if (targetSlot && this.textContent === targetSlot.dataset.char) {
+                    targetSlot.textContent = this.textContent;
+                    targetSlot.id = "filled";
+                    targetSlot.style.backgroundColor = "#fff";
+                    poolData.splice(index, 1); 
+                    renderPool(); 
+                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
                 }
             };
             pool.appendChild(div);
         });
+    }
 
-        function finish() {
-            document.getElementById('sound-cheer').play(); 
-            document.getElementById('reset-btn').style.display = 'block';
-            startConfetti(); 
-        }
-
-        function startConfetti() {
-            const canvas = document.getElementById("confetti-canvas");
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const ctx = canvas.getContext("2d");
-            let particles = Array.from({length: 100}, () => ({x: Math.random()*canvas.width, y: -10, r: Math.random()*5+2, color: `hsl(${Math.random()*360}, 100%, 50%)`, speed: Math.random()*3+2}));
-            function draw() {
-                ctx.clearRect(0,0,canvas.width, canvas.height);
-                particles.forEach(p => { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y+=p.speed, p.r, 0, Math.PI*2); ctx.fill(); if(p.y > canvas.height) p.y = -10; });
-                requestAnimationFrame(draw);
+    function initGame() {
+        const slotsDiv = document.getElementById('slots');
+        fullText.split('').forEach((char) => {
+            if (puncRegex.test(char)) {
+                let punc = document.createElement('span');
+                punc.className = 'punctuation';
+                punc.textContent = char;
+                slotsDiv.appendChild(punc);
+            } else {
+                let slot = document.createElement('div');
+                slot.className = 'slot empty-slot';
+                slot.dataset.char = char;
+                slotsDiv.appendChild(slot);
             }
-            draw();
+        });
+
+        const options = fullText.split('').filter(c => !puncRegex.test(c));
+        const blockSize = 5;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
         }
-    </script>
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        poolData = blocks.flat();
+        renderPool();
+    }
+
+    function finish() {
+        clearInterval(timerInterval);
+        const msg = new SpeechSynthesisUtterance("太棒了");
+        msg.lang = 'zh-TW';
+        window.speechSynthesis.speak(msg);
+        
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        document.getElementById('reset-btn').style.display = 'inline-block';
+        document.getElementById('undo-btn').style.display = 'none';
+        document.getElementById('word-pool').style.display = 'none';
+    }
+
+    initGame();
+</script>
 </body>
 </html>
