@@ -4,109 +4,166 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>聖經拼圖 - 詩篇 118:24</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #f0f7ff; margin: 0; min-height: 100vh; }
-        h2 { color: #003366; margin: 10px 0; }
-        .grid-container { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 10px; max-width: 95%; }
-        .slot { width: 45px; height: 45px; border: 2px dashed #00509e; display: flex; align-items: center; justify-content: center; background-color: #e3f2fd; border-radius: 6px; font-weight: bold; }
-        /* 新增樣式：讓標點符號的格子沒有邊框背景 */
-        .fixed { border: none; background: transparent; }
-        .word { padding: 0 10px; height: 40px; background-color: #003366; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 6px; margin: 4px; touch-action: manipulation; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
-        .hidden { visibility: hidden; }
-        #word-pool { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 20px; max-width: 95%; }
-        #reset-btn { margin-top: 20px; padding: 10px 20px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; }
-        #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
-        .instruction { color: #555; font-size: 14px; margin-bottom: 15px; font-weight: bold; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
+        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 50px; }
+        
+        /* 固定計時器：右上角 */
+        #timer { position: fixed; top: 10px; right: 10px; font-size: 18px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; z-index: 1000; border: 1px solid #8b4513; }
+        
+        h2 { color: #8b4513; margin: 10px 0; }
+        
+        .action-container { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
+        .preview-btn { padding: 8px 15px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        
+        .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
+        .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
+        
+        .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
+        .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
+        
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .action-btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        #undo-btn { background: #f39c12; color: white; }
+        #reset-btn { background: #ff5722; color: white; display: none; }
     </style>
 </head>
 <body>
 
-    <canvas id="confetti-canvas"></canvas>
+<div id="timer">時間: 00:00</div>
+
+<div class="full-width">
     <h2>詩篇 118:24</h2>
     
-    <a href="https://www.youtube.com/shorts/z7R4P9D1jRo" target="_blank" style="text-decoration: none; padding: 10px 20px; background: #FF0000; color: white; border-radius: 5px; font-size: 16px; display: inline-block; margin-bottom: 5px; font-weight: bold; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">🎥 觀看複習影片</a>
-    
+    <div class="action-container">
+        <a href="https://www.youtube.com/shorts/z7R4P9D1jRo" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+        <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
+    </div>
+
     <div class="instruction">請點選下方的字，填入空格中</div>
 
     <div id="slots" class="grid-container"></div>
-    <div id="word-pool"></div>
-    <button id="reset-btn" onclick="location.reload()">再玩一次</button>
+    <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+    
+    <div class="btn-group">
+        <button id="reset-btn" class="action-btn" onclick="location.reload()">再玩一次</button>
+    </div>
+</div>
 
-    <audio id="sound-drop" src="https://actions.google.com/sounds/v1/water/pop.ogg"></audio>
-    <audio id="sound-error" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-    <audio id="sound-cheer" src="https://actions.google.com/sounds/v1/crowds/human_crowd_cheering_short.ogg"></audio>
+<script>
+    const fullText = "這是耶和華所定的日子，我們在其中要高興歡喜！（詩118：24）";
+    const puncRegex = /[\-，。、（）：！]/; 
+    let poolData = [];
+    let timerInterval, seconds = 0, timerStarted = false;
 
-    <script>
-        const verseArr = ["這","是","耶","和","華","所","定","的","日","子","，","我","們","在","其","中","要","高","興","歡","喜","！","詩","篇","1","1","8",":","2","4"];
-        const punctuations = ["，", "！", ":"];
-        let currentSlot = 0;
+    function startTimer() {
+        if (!timerStarted) {
+            timerStarted = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                let m = Math.floor(seconds / 60);
+                let s = seconds % 60;
+                document.getElementById('timer').textContent = `時間: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+    }
 
-        const slotsDiv = document.getElementById('slots');
-        const pool = document.getElementById('word-pool');
+    function undoLast() {
+        const filled = document.querySelectorAll('.slot[id="filled"]');
+        if (filled.length > 0) {
+            const lastSlot = filled[filled.length - 1];
+            poolData.push(lastSlot.dataset.char);
+            lastSlot.textContent = "";
+            lastSlot.removeAttribute('id');
+            lastSlot.style.backgroundColor = "#fff";
+            // 重新打亂並渲染以達成更正後合攏效果
+            renderPool();
+        }
+    }
 
-        // 建立格子：若為標點符號則直接顯示並固定
-        verseArr.forEach((char) => {
-            let slot = document.createElement('div');
-            slot.className = 'slot';
-            if (punctuations.includes(char)) {
-                slot.textContent = char;
-                slot.classList.add('fixed');
-            } else {
-                slot.dataset.answer = char;
+    function showPreview() {
+        const slots = document.querySelectorAll('.empty-slot');
+        slots.forEach(slot => {
+            if (slot.id !== "filled") {
+                slot.textContent = slot.dataset.char;
+                slot.style.backgroundColor = "#e0d0b0";
             }
-            slotsDiv.appendChild(slot);
         });
+        setTimeout(() => {
+            slots.forEach(slot => {
+                if (slot.id !== "filled") {
+                    slot.textContent = "";
+                    slot.style.backgroundColor = "#fff";
+                }
+            });
+        }, 5000); 
+    }
 
-        // 過濾掉標點符號，建立文字庫
-        const shuffled = [...verseArr].filter(c => !punctuations.includes(c)).sort(() => Math.random() - 0.5);
-        
-        shuffled.forEach((w) => {
+    function renderPool() {
+        const pool = document.getElementById('word-pool');
+        pool.innerHTML = '';
+        poolData.forEach((char, index) => {
             let div = document.createElement('div');
             div.className = 'word';
-            div.textContent = w;
+            div.textContent = char;
             div.onclick = function() {
-                // 找到下一個需要填入的非標點符號格子
-                let allSlots = document.querySelectorAll('.slot');
-                let targetIndex = -1;
-                for(let i = 0; i < allSlots.length; i++) {
-                    if(!allSlots[i].textContent && !allSlots[i].classList.contains('fixed')) {
-                        targetIndex = i;
-                        break;
-                    }
-                }
-                
-                if (targetIndex !== -1 && this.textContent === allSlots[targetIndex].dataset.answer) {
-                    allSlots[targetIndex].textContent = this.textContent;
-                    this.className = 'hidden';
-                    document.getElementById('sound-drop').play();
-                    // 檢查是否所有字都填完了
-                    let emptySlots = Array.from(allSlots).filter(s => !s.textContent && !s.classList.contains('fixed'));
-                    if (emptySlots.length === 0) finish();
-                } else {
-                    document.getElementById('sound-error').play();
+                startTimer();
+                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                if (targetSlot && this.textContent === targetSlot.dataset.char) {
+                    targetSlot.textContent = this.textContent;
+                    targetSlot.id = "filled";
+                    targetSlot.style.backgroundColor = "#fff";
+                    poolData.splice(index, 1); 
+                    renderPool(); 
+                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
                 }
             };
             pool.appendChild(div);
         });
+    }
 
-        function finish() {
-            document.getElementById('sound-cheer').play();
-            document.getElementById('reset-btn').style.display = 'block';
-            startConfetti();
-        }
-
-        function startConfetti() {
-            const canvas = document.getElementById("confetti-canvas");
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const ctx = canvas.getContext("2d");
-            let particles = Array.from({length: 100}, () => ({x: Math.random()*canvas.width, y: -10, r: Math.random()*5+2, color: `hsl(${Math.random()*360}, 100%, 50%)`, speed: Math.random()*3+2}));
-            function draw() {
-                ctx.clearRect(0,0,canvas.width, canvas.height);
-                particles.forEach(p => { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y+=p.speed, p.r, 0, Math.PI*2); ctx.fill(); if(p.y > canvas.height) p.y = -10; });
-                requestAnimationFrame(draw);
+    function initGame() {
+        const slotsDiv = document.getElementById('slots');
+        fullText.split('').forEach((char) => {
+            if (puncRegex.test(char)) {
+                let punc = document.createElement('span');
+                punc.className = 'punctuation';
+                punc.textContent = char;
+                slotsDiv.appendChild(punc);
+            } else {
+                let slot = document.createElement('div');
+                slot.className = 'slot empty-slot';
+                slot.dataset.char = char;
+                slotsDiv.appendChild(slot);
             }
-            draw();
+        });
+
+        const options = fullText.split('').filter(c => !puncRegex.test(c));
+        const blockSize = 5;
+        let blocks = [];
+        for (let i = 0; i < options.length; i += blockSize) {
+            blocks.push(options.slice(i, i + blockSize));
         }
-    </script>
+        blocks.forEach(block => block.sort(() => Math.random() - 0.5));
+        poolData = blocks.flat();
+        renderPool();
+    }
+
+    function finish() {
+        clearInterval(timerInterval);
+        const msg = new SpeechSynthesisUtterance("太棒了");
+        msg.lang = 'zh-TW';
+        window.speechSynthesis.speak(msg);
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        document.getElementById('reset-btn').style.display = 'inline-block';
+        document.getElementById('undo-btn').style.display = 'none';
+        document.getElementById('word-pool').style.display = 'none';
+    }
+
+    initGame();
+</script>
 </body>
 </html>
