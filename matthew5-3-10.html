@@ -15,7 +15,8 @@
         .yt-link { text-decoration: none; padding: 8px 15px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
         .action-btn { padding: 8px 15px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 20px 0; align-items: center; }
-        .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; }
+        .slot { width: 32px; height: 32px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 16px; color: #333; transition: background-color 0.3s; }
+        .slot.locked { background-color: #fff !important; }
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         .hidden { visibility: hidden; }
@@ -30,7 +31,7 @@
 <div id="timer">時間: 00:00</div>
 
 <div class="full-width">
-    <h2 id="stage-title">八福 - 第一階段</h2>
+    <h2 id="stage-title">八福主題拼圖 - 第一段</h2>
     <div id="theme-display" class="theme"></div>
     
     <div class="action-container">
@@ -43,16 +44,16 @@
     
     <div id="feedback" class="feedback">
         <button id="next-stage-btn" class="btn next-btn" onclick="nextStage()">進入下一段</button>
-        <button class="btn reset-btn" onclick="resetCurrentStage()">再玩一次</button>
+        <button class="btn reset-btn" onclick="renderStage()">再玩一次</button>
     </div>
 </div>
 
 <script>
     const bibleData = [
-        { text: "虛心的人有福了！因為天國是他們的。哀慟的人有福了！因為他們必得安慰。", theme: "虛心與哀慟" },
-        { text: "溫柔的人有福了！因為他們必承受地土。飢渴慕義的人有福了！因為他們必得飽足。", theme: "溫柔與慕義" },
-        { text: "憐恤人的人有福了！因為他們必蒙憐恤。清心的人有福了！因為他們必得見神。", theme: "憐恤與清心" },
-        { text: "使人和睦的人有福了！因為他們必稱為神的兒子。為義受逼迫的人有福了！因為天國是他們的。", theme: "和睦與受逼迫" }
+        { text: "虛心的人有福了！因為天國是他們的。哀慟的人有福了！因為他們必得安慰。", theme: "第一主題：靈裡的貧窮與謙卑" },
+        { text: "溫柔的人有福了！因為他們必承受地土。飢渴慕義的人有福了！因為他們必得飽足。", theme: "第二主題：對神與人的柔順與渴望" },
+        { text: "憐恤人的人有福了！因為他們必蒙憐恤。清心的人有福了！因為他們必得見神。", theme: "第三主題：愛的行動與內心的潔淨" },
+        { text: "使人和睦的人有福了！因為他們必稱為神的兒子。為義受逼迫的人有福了！因為天國是他們的。", theme: "第四主題：和平使者與受逼迫" }
     ];
 
     let currentStage = 0, seconds = 0, timerStarted = false, timerInterval;
@@ -63,8 +64,11 @@
 
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
-        slots.forEach(s => { s.textContent = s.dataset.char; s.style.backgroundColor = "#e0d0b0"; 
-            setTimeout(() => { if(!s.classList.contains('locked')) { s.textContent = ""; s.style.backgroundColor = "#fff"; } }, 3000);
+        slots.forEach(s => { 
+            if (!s.classList.contains('locked')) {
+                s.textContent = s.dataset.char; s.style.backgroundColor = "#e0d0b0"; 
+                setTimeout(() => { if(!s.classList.contains('locked')) { s.textContent = ""; s.style.backgroundColor = "#fff"; } }, 3000);
+            }
         });
     }
 
@@ -72,7 +76,7 @@
         resetTimer();
         const slotsDiv = document.getElementById('slots'), pool = document.getElementById('word-pool');
         slotsDiv.innerHTML = ''; pool.innerHTML = ''; document.getElementById('feedback').style.display = 'none';
-        document.getElementById('stage-title').innerText = `八福 - 第 ${currentStage + 1} 階段`;
+        document.getElementById('stage-title').innerText = `八福主題拼圖 - 第 ${currentStage + 1} 段`;
         document.getElementById('theme-display').innerText = bibleData[currentStage].theme;
 
         const text = bibleData[currentStage].text, chars = text.split('');
@@ -108,7 +112,6 @@
         });
     }
 
-    function resetCurrentStage() { renderStage(); }
     function nextStage() { currentStage++; if (currentStage < bibleData.length) renderStage(); }
 
     renderStage();
