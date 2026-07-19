@@ -1,4 +1,4 @@
-對手<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; }
         .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 50px; }
         
-        /* 固定計時器：右上角，確保不遮蓋標題且在三星等裝置皆顯示 */
+        /* 固定計時器：右上角，不遮蓋標題 */
         #timer { position: fixed; top: 10px; right: 10px; font-size: 18px; font-weight: bold; color: #8b4513; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; z-index: 1000; border: 1px solid #8b4513; }
         
         h2 { color: #8b4513; margin: 10px 0; }
@@ -24,8 +24,10 @@
         .punctuation { font-size: 18px; font-weight: bold; color: #5d6d7e; margin: 0 2px; }
         .word { padding: 8px 12px; background-color: #8b4513; color: #ffffff; cursor: pointer; font-size: 14px; border-radius: 6px; margin: 3px; touch-action: manipulation; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         .instruction { color: #5d6d7e; margin-bottom: 15px; font-weight: bold; }
-        #reset-btn { margin-top: 20px; padding: 10px 25px; background: #ff5722; color: white; border: none; border-radius: 5px; font-size: 16px; display: none; cursor: pointer; font-weight: bold; }
-        .explanation { text-align: left; background: #fffdf5; padding: 15px; margin-top: 30px; border: 1px solid #e0d8c0; border-radius: 8px; font-size: 13px; color: #4a3c2e; line-height: 1.5; }
+        
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .action-btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        #reset-btn { background: #ff5722; color: white; display: none; padding: 10px 25px; }
     </style>
 </head>
 <body>
@@ -36,7 +38,7 @@
     <h2>馬可福音 16:20</h2>
     
     <div class="action-container">
-        <a href="https://youtube.com/shorts/ESshXARD0gU" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+        <a href="https://www.youtube.com/shorts/ESshXARD0gU" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
 
@@ -45,12 +47,12 @@
     <div id="slots" class="grid-container"></div>
     <div id="word-pool" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
     
-    <button id="reset-btn" onclick="location.reload()">再玩一次</button>
+    <button id="reset-btn" class="action-btn" onclick="location.reload()">再玩一次</button>
 </div>
 
 <script>
     const fullText = "門徒出去，到處宣傳福音。主和他們同工，用神蹟隨著，證實所傳的道。阿們！馬可福音16:20";
-    const puncRegex = /[，。！：]/;
+    const puncRegex = /[，。！：]/; 
     let poolData = [];
     let timerInterval, seconds = 0, timerStarted = false;
 
