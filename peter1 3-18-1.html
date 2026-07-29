@@ -167,7 +167,7 @@
             margin-top: 5px;
         }
 
-        /* 更改為單個字隨機散落掉落的方塊樣式 */
+        /* 散落掉落的單字方塊樣式 */
         .falling-char {
             position: absolute;
             width: 50px;
@@ -439,11 +439,28 @@
             updateVisualSlots();
             document.getElementById('feedback').innerText = `單字掉下來囉！請按順序點擊`;
 
-            // 改為每隔一段時間隨機掉落單個字，不再以整排直線掉落
+            // 按照順序依序讓字掉下來，並稍微隨機調換一兩個字的順序
+            let dropIndex = 0;
+            // 建立一個接近原本順序但隨機微調的掉落序列
+            let sequenceIndices = targetChars.map((_, i) => i);
+            if (sequenceIndices.length >= 3) {
+                // 隨機選一個位置和它相鄰的位置互換一兩次，保持大體順序但有隨機感
+                let swapPos = Math.floor(Math.random() * (sequenceIndices.length - 1));
+                let temp = sequenceIndices[swapPos];
+                sequenceIndices[swapPos] = sequenceIndices[swapPos + 1];
+                sequenceIndices[swapPos + 1] = temp;
+            }
+
             gameInterval = setInterval(() => {
                 if (isPaused) return;
-                let randomChar = targetChars[Math.floor(Math.random() * targetChars.length)];
-                spawnFallingChar(randomChar);
+                if (dropIndex < sequenceIndices.length) {
+                    let charToDrop = targetChars[sequenceIndices[dropIndex]];
+                    spawnFallingChar(charToDrop);
+                    dropIndex++;
+                } else {
+                    // 一輪掉完後重置循環掉落
+                    dropIndex = 0;
+                }
             }, 1200);
         }
 
