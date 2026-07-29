@@ -439,7 +439,7 @@
             updateVisualSlots();
             document.getElementById('feedback').innerText = `單字掉下來囉！請按順序點擊`;
 
-            // 將掉字間隔從 3500ms（整排）或 1200ms 加快縮短為 600ms 左右，大幅減少等待時間
+            // 將掉落頻率加快到每 450ms 掉一個字，讓畫面隨時保持有字掉落，不用等待
             let dropIndex = 0;
             let sequenceIndices = targetChars.map((_, i) => i);
             if (sequenceIndices.length >= 3) {
@@ -456,9 +456,9 @@
                     spawnFallingChar(charToDrop);
                     dropIndex++;
                 } else {
-                    dropIndex = 0;
+                    dropIndex = 0; // 循環掉落，確保不中斷
                 }
-            }, 700);
+            }, 450);
         }
 
         function updateVisualSlots() {
