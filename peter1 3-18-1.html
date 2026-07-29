@@ -291,6 +291,7 @@
 
         let targetChars = [];
         let nextCharIndex = 0;
+        let dropIndices = []; // 儲存尚未被選到的字索引順序
 
         function playSuccessSound() {
             try {
@@ -435,30 +436,38 @@
             targetChars = currentItem.classic.split('');
             nextCharIndex = 0;
             
+            // 初始化尚未被選到的字索引清單（從 nextCharIndex 到結尾）
+            updateDropIndices();
+
             document.getElementById('question').innerText = currentItem.modern;
             updateVisualSlots();
             document.getElementById('feedback').innerText = `單字掉下來囉！請按順序點擊`;
 
-            // 將掉落頻率加快到每 450ms 掉一個字，讓畫面隨時保持有字掉落，不用等待
-            let dropIndex = 0;
-            let sequenceIndices = targetChars.map((_, i) => i);
-            if (sequenceIndices.length >= 3) {
-                let swapPos = Math.floor(Math.random() * (sequenceIndices.length - 1));
-                let temp = sequenceIndices[swapPos];
-                sequenceIndices[swapPos] = sequenceIndices[swapPos + 1];
-                sequenceIndices[swapPos + 1] = temp;
-            }
-
             gameInterval = setInterval(() => {
                 if (isPaused) return;
-                if (dropIndex < sequenceIndices.length) {
-                    let charToDrop = targetChars[sequenceIndices[dropIndex]];
-                    spawnFallingChar(charToDrop);
-                    dropIndex++;
-                } else {
-                    dropIndex = 0; // 循環掉落，確保不中斷
+                
+                // 如果當前需要按的字已經超過範圍，重新整理未選字清單
+                if (dropIndices.length === 0) {
+                    updateDropIndices();
                 }
-            }, 450);
+
+                if (dropIndices.length > 0) {
+                    // 從尚未被正確選取的剩餘字中隨機挑選一個掉落
+                    let randomIndexPos = Math.floor(Math.random() * dropIndices.length);
+                    let charIndexToDrop = dropIndices[randomIndexPos];
+                    let charToDrop = targetChars[charIndexToDrop];
+                    
+                    spawnFallingChar(charToDrop, charIndexToDrop);
+                }
+            }, 700);
+        }
+
+        function updateDropIndices() {
+            // 只讓還沒被選到（大於或等於當前正確順序位置）的字掉落，藉此做到「選到的字不再重複掉落」
+            dropIndices = [];
+            for (let i = nextCharIndex; i < targetChars.length; i++) {
+                dropIndices.push(i);
+            }
         }
 
         function updateVisualSlots() {
@@ -486,7 +495,7 @@
             document.getElementById('feedback').innerText = `經文：${currentItem.classic}`;
         }
 
-        function spawnFallingChar(charVal) {
+        function spawnFallingChar(charVal, charIndex) {
             const container = document.getElementById('drop-game-container');
             const charEl = document.createElement('div');
             charEl.className = 'falling-char';
@@ -508,10 +517,12 @@
                 e.stopPropagation();
                 if (isPaused || isCharHandled) return;
 
-                if (charVal === targetChars[nextCharIndex]) {
+                // 檢查是否點到目前正確順序應點的字
+                if (charIndex === nextCharIndex) {
                     isCharHandled = true;
                     nextCharIndex++;
                     updateVisualSlots();
+                    updateDropIndices(); // 更新剩餘未點擊的掉落清單，已點的字立刻不再掉落
 
                     if (nextCharIndex >= targetChars.length) {
                         score++;
