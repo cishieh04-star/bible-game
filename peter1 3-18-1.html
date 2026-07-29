@@ -167,9 +167,17 @@
             margin-top: 5px;
         }
 
-        /* 散落掉落的單字方塊樣式 */
-        .falling-char {
+        /* 恢復成一條線整排掉落的容器 (橫向排列) */
+        .falling-row {
             position: absolute;
+            display: flex;
+            gap: 12px;
+            animation: fall linear forwards;
+            z-index: 10;
+        }
+
+        /* 掉落整排中的個別字方塊 */
+        .falling-char-in-row {
             width: 50px;
             height: 50px;
             background: radial-gradient(circle, #fde047 60%, #eab308 100%);
@@ -183,11 +191,9 @@
             color: #78350f;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            animation: fall linear forwards;
-            z-index: 10;
             touch-action: manipulation;
         }
-        .falling-char:active { transform: scale(0.9); }
+        .falling-char-in-row:active { transform: scale(0.9); }
 
         @keyframes fall {
             0% { top: -65px; }
@@ -283,7 +289,7 @@
         let currentItem = null;
         let score = 0;
         let gameInterval = null;
-        let activeChars = [];
+        let activeRows = [];
         let isPaused = false;
         let timerInterval = null;
         let totalSeconds = 0; 
@@ -291,7 +297,6 @@
 
         let targetChars = [];
         let nextCharIndex = 0;
-        let dropIndices = []; // 儲存尚未被選到的字索引順序
 
         function playSuccessSound() {
             try {
@@ -404,14 +409,14 @@
                 pauseBtn.innerText = "繼續遊戲";
                 pauseBtn.style.backgroundColor = "#16a34a";
                 document.getElementById('feedback').innerText = "⏸️ 遊戲已暫停";
-                activeChars.forEach(el => {
+                activeRows.forEach(el => {
                     el.style.animationPlayState = 'paused';
                 });
             } else {
                 pauseBtn.innerText = "暫停遊戲";
                 pauseBtn.style.backgroundColor = "#d97706";
                 document.getElementById('feedback').innerText = "▶️ 遊戲繼續！";
-                activeChars.forEach(el => {
+                activeRows.forEach(el => {
                     el.style.animationPlayState = 'running';
                 });
             }
@@ -419,8 +424,8 @@
 
         function loadQuestion() {
             if (gameInterval) clearInterval(gameInterval);
-            activeChars.forEach(el => el.remove());
-            activeChars = [];
+            activeRows.forEach(el => el.remove());
+            activeRows = [];
 
             if (currentIndex >= idiomsData.length) {
                 if (timerInterval) clearInterval(timerInterval);
@@ -436,38 +441,14 @@
             targetChars = currentItem.classic.split('');
             nextCharIndex = 0;
             
-            // 初始化尚未被選到的字索引清單（從 nextCharIndex 到結尾）
-            updateDropIndices();
-
             document.getElementById('question').innerText = currentItem.modern;
             updateVisualSlots();
-            document.getElementById('feedback').innerText = `單字掉下來囉！請按順序點擊`;
+            document.getElementById('feedback').innerText = `整排字掉下來囉！請按順序點擊`;
 
             gameInterval = setInterval(() => {
                 if (isPaused) return;
-                
-                // 如果當前需要按的字已經超過範圍，重新整理未選字清單
-                if (dropIndices.length === 0) {
-                    updateDropIndices();
-                }
-
-                if (dropIndices.length > 0) {
-                    // 從尚未被正確選取的剩餘字中隨機挑選一個掉落
-                    let randomIndexPos = Math.floor(Math.random() * dropIndices.length);
-                    let charIndexToDrop = dropIndices[randomIndexPos];
-                    let charToDrop = targetChars[charIndexToDrop];
-                    
-                    spawnFallingChar(charToDrop, charIndexToDrop);
-                }
-            }, 700);
-        }
-
-        function updateDropIndices() {
-            // 只讓還沒被選到（大於或等於當前正確順序位置）的字掉落，藉此做到「選到的字不再重複掉落」
-            dropIndices = [];
-            for (let i = nextCharIndex; i < targetChars.length; i++) {
-                dropIndices.push(i);
-            }
+                spawnFallingRow();
+            }, 3000);
         }
 
         function updateVisualSlots() {
@@ -495,78 +476,98 @@
             document.getElementById('feedback').innerText = `經文：${currentItem.classic}`;
         }
 
-        function spawnFallingChar(charVal, charIndex) {
+        function spawnFallingRow() {
             const container = document.getElementById('drop-game-container');
-            const charEl = document.createElement('div');
-            charEl.className = 'falling-char';
-            charEl.innerText = charVal;
+            const rowEl = document.createElement('div');
+            rowEl.className = 'falling-row';
 
-            const randomX = Math.random() * (container.clientWidth - 55);
-            charEl.style.left = Math.max(5, randomX) + 'px';
-
-            const duration = 3.0 + Math.random() * 1.0;
-            charEl.style.animationDuration = duration + 's';
-
-            if (isPaused) {
-                charEl.style.animationPlayState = 'paused';
+            // 只挑選出還沒有被玩家選到的字來組成掉落的整排線
+            let remainingChars = [];
+            for (let i = nextCharIndex; i < targetChars.length; i++) {
+                remainingChars.push(targetChars[i]);
             }
 
-            let isCharHandled = false;
-            const handleCharSelect = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (isPaused || isCharHandled) return;
+            // 如果這一句已經全部選完了就不用再掉
+            if (remainingChars.length === 0) return;
 
-                // 檢查是否點到目前正確順序應點的字
-                if (charIndex === nextCharIndex) {
-                    isCharHandled = true;
-                    nextCharIndex++;
-                    updateVisualSlots();
-                    updateDropIndices(); // 更新剩餘未點擊的掉落清單，已點的字立刻不再掉落
+            // 將剩餘未選的字隨機洗牌排成一排掉下來
+            let shuffledThisTime = [...remainingChars].sort(() => Math.random() - 0.5);
 
-                    if (nextCharIndex >= targetChars.length) {
-                        score++;
-                        document.getElementById('score').innerText = `闖關: ${score} / ${idiomsData.length}`;
-                        document.getElementById('feedback').innerText = "🎉 太棒了！這句排對囉！";
-                        
-                        playSuccessSound();
-                        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            shuffledThisTime.forEach(char => {
+                // 找出這個字在原本 targetChars 中的真實索引，用來點擊時做正確順序校對
+                let charOriginalIndex = targetChars.indexOf(char, nextCharIndex);
 
-                        clearInterval(gameInterval);
-                        activeChars.forEach(el => el.remove());
-                        activeChars = [];
+                const charEl = document.createElement('div');
+                charEl.className = 'falling-char-in-row';
+                charEl.innerText = char;
 
-                        currentIndex++;
-                        setTimeout(() => {
-                            if (!isPaused) loadQuestion();
-                        }, 2000);
+                let isCharHandled = false;
+                const handleCharSelect = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isPaused || isCharHandled) return;
+
+                    // 檢查點擊到的字是否剛好是目前順序下一個要找的字
+                    if (charOriginalIndex === nextCharIndex) {
+                        isCharHandled = true;
+                        charEl.style.visibility = 'hidden'; 
+                        nextCharIndex++;
+                        updateVisualSlots();
+
+                        if (nextCharIndex >= targetChars.length) {
+                            score++;
+                            document.getElementById('score').innerText = `闖關: ${score} / ${idiomsData.length}`;
+                            document.getElementById('feedback').innerText = "🎉 太棒了！這句排對囉！";
+                            
+                            playSuccessSound();
+                            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+
+                            clearInterval(gameInterval);
+                            activeRows.forEach(el => el.remove());
+                            activeRows = [];
+
+                            currentIndex++;
+                            setTimeout(() => {
+                                if (!isPaused) loadQuestion();
+                            }, 2500);
+                        } else {
+                            playSuccessSound();
+                            // 當選對一個字之後，讓畫面上目前正在掉落的這一整排裡「已經被選過或是其他不相干的重複字」立刻隱藏消失，避免重複出現或干擾
+                            rowEl.querySelectorAll('.falling-char-in-row').forEach(node => {
+                                if (targetChars.indexOf(node.innerText, nextCharIndex) === -1) {
+                                    node.style.visibility = 'hidden';
+                                }
+                            });
+                        }
                     } else {
-                        playSuccessSound();
-                        charEl.style.transition = "transform 0.2s, opacity 0.2s";
-                        charEl.style.transform = "scale(1.4)";
-                        charEl.style.opacity = "0";
-                        setTimeout(() => charEl.remove(), 200);
+                        playErrorSound();
+                        document.getElementById('feedback').innerText = `❌ 順序不對喔！要找「${targetChars[nextCharIndex]}」`;
                     }
-                } else {
-                    playErrorSound();
-                    document.getElementById('feedback').innerText = `❌ 順序不對喔！要找「${targetChars[nextCharIndex]}」`;
-                    
-                    charEl.style.transition = "opacity 0.3s";
-                    charEl.style.opacity = "0";
-                    setTimeout(() => charEl.remove(), 300);
-                }
-            };
+                };
 
-            charEl.addEventListener('click', handleCharSelect);
-            charEl.addEventListener('touchstart', handleCharSelect, { passive: false });
+                charEl.addEventListener('click', handleCharSelect);
+                charEl.addEventListener('touchstart', handleCharSelect, { passive: false });
 
-            charEl.addEventListener('animationend', () => {
-                charEl.remove();
-                activeChars = activeChars.filter(item => item !== charEl);
+                rowEl.appendChild(charEl);
+            });
+            
+            const randomX = Math.random() * (container.clientWidth - (shuffledThisTime.length * 62));
+            rowEl.style.left = Math.max(10, randomX) + 'px';
+
+            const duration = 5.0 + Math.random() * 1.5;
+            rowEl.style.animationDuration = duration + 's';
+
+            if (isPaused) {
+                rowEl.style.animationPlayState = 'paused';
+            }
+
+            rowEl.addEventListener('animationend', () => {
+                rowEl.remove();
+                activeRows = activeRows.filter(item => item !== rowEl);
             });
 
-            container.appendChild(charEl);
-            activeChars.push(charEl);
+            container.appendChild(rowEl);
+            activeRows.push(rowEl);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
