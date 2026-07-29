@@ -167,17 +167,9 @@
             margin-top: 5px;
         }
 
-        /* 呈一條線整排掉落的容器 (橫向排列整句的字) */
-        .falling-row {
+        /* 更改為單個字隨機散落掉落的方塊樣式 */
+        .falling-char {
             position: absolute;
-            display: flex;
-            gap: 12px;
-            animation: fall linear forwards;
-            z-index: 10;
-        }
-
-        /* 掉落整排中的個別字方塊 */
-        .falling-char-in-row {
             width: 50px;
             height: 50px;
             background: radial-gradient(circle, #fde047 60%, #eab308 100%);
@@ -191,9 +183,11 @@
             color: #78350f;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            animation: fall linear forwards;
+            z-index: 10;
             touch-action: manipulation;
         }
-        .falling-char-in-row:active { transform: scale(0.9); }
+        .falling-char:active { transform: scale(0.9); }
 
         @keyframes fall {
             0% { top: -65px; }
@@ -289,7 +283,7 @@
         let currentItem = null;
         let score = 0;
         let gameInterval = null;
-        let activeRows = [];
+        let activeChars = [];
         let isPaused = false;
         let timerInterval = null;
         let totalSeconds = 0; 
@@ -409,14 +403,14 @@
                 pauseBtn.innerText = "繼續遊戲";
                 pauseBtn.style.backgroundColor = "#16a34a";
                 document.getElementById('feedback').innerText = "⏸️ 遊戲已暫停";
-                activeRows.forEach(el => {
+                activeChars.forEach(el => {
                     el.style.animationPlayState = 'paused';
                 });
             } else {
                 pauseBtn.innerText = "暫停遊戲";
                 pauseBtn.style.backgroundColor = "#d97706";
                 document.getElementById('feedback').innerText = "▶️ 遊戲繼續！";
-                activeRows.forEach(el => {
+                activeChars.forEach(el => {
                     el.style.animationPlayState = 'running';
                 });
             }
@@ -424,8 +418,8 @@
 
         function loadQuestion() {
             if (gameInterval) clearInterval(gameInterval);
-            activeRows.forEach(el => el.remove());
-            activeRows = [];
+            activeChars.forEach(el => el.remove());
+            activeChars = [];
 
             if (currentIndex >= idiomsData.length) {
                 if (timerInterval) clearInterval(timerInterval);
@@ -443,12 +437,14 @@
             
             document.getElementById('question').innerText = currentItem.modern;
             updateVisualSlots();
-            document.getElementById('feedback').innerText = `整排字掉下來囉！請按順序點擊`;
+            document.getElementById('feedback').innerText = `單字掉下來囉！請按順序點擊`;
 
+            // 改為每隔一段時間隨機掉落單個字，不再以整排直線掉落
             gameInterval = setInterval(() => {
                 if (isPaused) return;
-                spawnFallingRow();
-            }, 3500);
+                let randomChar = targetChars[Math.floor(Math.random() * targetChars.length)];
+                spawnFallingChar(randomChar);
+            }, 1200);
         }
 
         function updateVisualSlots() {
@@ -476,78 +472,77 @@
             document.getElementById('feedback').innerText = `經文：${currentItem.classic}`;
         }
 
-        function spawnFallingRow() {
+        function spawnFallingChar(charVal) {
             const container = document.getElementById('drop-game-container');
-            const rowEl = document.createElement('div');
-            rowEl.className = 'falling-row';
+            const charEl = document.createElement('div');
+            charEl.className = 'falling-char';
+            charEl.innerText = charVal;
 
-            let shuffledThisTime = [...targetChars].sort(() => Math.random() - 0.5);
+            // 隨機水平位置分散掉落，避免排成一直線
+            const randomX = Math.random() * (container.clientWidth - 55);
+            charEl.style.left = Math.max(5, randomX) + 'px';
 
-            shuffledThisTime.forEach(char => {
-                const charEl = document.createElement('div');
-                charEl.className = 'falling-char-in-row';
-                charEl.innerText = char;
-
-                let isCharHandled = false;
-                const handleCharSelect = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (isPaused || isCharHandled) return;
-
-                    if (char === targetChars[nextCharIndex]) {
-                        isCharHandled = true;
-                        charEl.style.visibility = 'hidden'; 
-                        nextCharIndex++;
-                        updateVisualSlots();
-
-                        if (nextCharIndex >= targetChars.length) {
-                            score++;
-                            document.getElementById('score').innerText = `闖關: ${score} / ${idiomsData.length}`;
-                            document.getElementById('feedback').innerText = "🎉 太棒了！這句排對囉！";
-                            
-                            playSuccessSound();
-                            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-
-                            clearInterval(gameInterval);
-                            activeRows.forEach(el => el.remove());
-                            activeRows = [];
-
-                            currentIndex++;
-                            setTimeout(() => {
-                                if (!isPaused) loadQuestion();
-                            }, 2500);
-                        } else {
-                            playSuccessSound();
-                        }
-                    } else {
-                        playErrorSound();
-                        document.getElementById('feedback').innerText = `❌ 順序不對喔！要找「${targetChars[nextCharIndex]}」`;
-                    }
-                };
-
-                charEl.addEventListener('click', handleCharSelect);
-                charEl.addEventListener('touchstart', handleCharSelect, { passive: false });
-
-                rowEl.appendChild(charEl);
-            });
-            
-            const randomX = Math.random() * (container.clientWidth - (targetChars.length * 62));
-            rowEl.style.left = Math.max(10, randomX) + 'px';
-
-            const duration = 5.0 + Math.random() * 1.5;
-            rowEl.style.animationDuration = duration + 's';
+            const duration = 3.5 + Math.random() * 1.5;
+            charEl.style.animationDuration = duration + 's';
 
             if (isPaused) {
-                rowEl.style.animationPlayState = 'paused';
+                charEl.style.animationPlayState = 'paused';
             }
 
-            rowEl.addEventListener('animationend', () => {
-                rowEl.remove();
-                activeRows = activeRows.filter(item => item !== rowEl);
+            let isCharHandled = false;
+            const handleCharSelect = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isPaused || isCharHandled) return;
+
+                if (charVal === targetChars[nextCharIndex]) {
+                    isCharHandled = true;
+                    nextCharIndex++;
+                    updateVisualSlots();
+
+                    if (nextCharIndex >= targetChars.length) {
+                        score++;
+                        document.getElementById('score').innerText = `闖關: ${score} / ${idiomsData.length}`;
+                        document.getElementById('feedback').innerText = "🎉 太棒了！這句排對囉！";
+                        
+                        playSuccessSound();
+                        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+
+                        clearInterval(gameInterval);
+                        activeChars.forEach(el => el.remove());
+                        activeChars = [];
+
+                        currentIndex++;
+                        setTimeout(() => {
+                            if (!isPaused) loadQuestion();
+                        }, 2500);
+                    } else {
+                        playSuccessSound();
+                        charEl.style.transition = "transform 0.2s, opacity 0.2s";
+                        charEl.style.transform = "scale(1.4)";
+                        charEl.style.opacity = "0";
+                        setTimeout(() => charEl.remove(), 200);
+                    }
+                } else {
+                    playErrorSound();
+                    document.getElementById('feedback').innerText = `❌ 順序不對喔！要找「${targetChars[nextCharIndex]}」`;
+                    
+                    charEl.style.transition = "opacity 0.3s";
+                    charEl.style.opacity = "0";
+                    setTimeout(() => charEl.remove(), 300);
+                }
+            };
+
+            charEl.addEventListener('click', handleCharSelect);
+            charEl.addEventListener('touchstart', handleCharSelect, { passive: false });
+
+            charEl.addEventListener('animationend', () => {
+                charEl.remove();
+                activeChars = activeChars.filter(item => item !== charEl);
             });
 
-            container.appendChild(rowEl);
-            activeRows.push(rowEl);
+            container.appendChild(charEl);
+            activeChars.push(charEl);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
