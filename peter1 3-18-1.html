@@ -439,12 +439,10 @@
             updateVisualSlots();
             document.getElementById('feedback').innerText = `單字掉下來囉！請按順序點擊`;
 
-            // 按照順序依序讓字掉下來，並稍微隨機調換一兩個字的順序
+            // 將掉字間隔從 3500ms（整排）或 1200ms 加快縮短為 600ms 左右，大幅減少等待時間
             let dropIndex = 0;
-            // 建立一個接近原本順序但隨機微調的掉落序列
             let sequenceIndices = targetChars.map((_, i) => i);
             if (sequenceIndices.length >= 3) {
-                // 隨機選一個位置和它相鄰的位置互換一兩次，保持大體順序但有隨機感
                 let swapPos = Math.floor(Math.random() * (sequenceIndices.length - 1));
                 let temp = sequenceIndices[swapPos];
                 sequenceIndices[swapPos] = sequenceIndices[swapPos + 1];
@@ -458,10 +456,9 @@
                     spawnFallingChar(charToDrop);
                     dropIndex++;
                 } else {
-                    // 一輪掉完後重置循環掉落
                     dropIndex = 0;
                 }
-            }, 1200);
+            }, 700);
         }
 
         function updateVisualSlots() {
@@ -495,11 +492,10 @@
             charEl.className = 'falling-char';
             charEl.innerText = charVal;
 
-            // 隨機水平位置分散掉落，避免排成一直線
             const randomX = Math.random() * (container.clientWidth - 55);
             charEl.style.left = Math.max(5, randomX) + 'px';
 
-            const duration = 3.5 + Math.random() * 1.5;
+            const duration = 3.0 + Math.random() * 1.0;
             charEl.style.animationDuration = duration + 's';
 
             if (isPaused) {
@@ -532,7 +528,7 @@
                         currentIndex++;
                         setTimeout(() => {
                             if (!isPaused) loadQuestion();
-                        }, 2500);
+                        }, 2000);
                     } else {
                         playSuccessSound();
                         charEl.style.transition = "transform 0.2s, opacity 0.2s";
