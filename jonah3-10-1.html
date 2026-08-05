@@ -145,7 +145,8 @@
     
     <div class="btn-group">
         <button id="undo-btn" class="action-btn" onclick="undoLast()">⟲ 更正</button>
-        <button id="reset-btn" class="action-btn" onclick="location.reload()">再玩一次</button>
+        <!-- 修改此處按鈕行為，點擊時直接重新初始化遊戲 -->
+        <button id="reset-btn" class="action-btn" onclick="resetGame()">再玩一次</button>
     </div>
 </div>
 
@@ -160,6 +161,19 @@
     function startGame() {
         document.getElementById('home-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
+        initGame();
+    }
+
+    // 重新開始遊戲（重置介面與狀態，不回首頁）
+    function resetGame() {
+        if (gameInterval) clearInterval(gameInterval);
+        if (activeBlock && activeBlock.element) activeBlock.element.remove();
+        
+        // 恢復通關後隱藏的元件
+        document.getElementById('tetris-container').style.display = 'block';
+        document.getElementById('reset-btn').style.display = 'none';
+        document.getElementById('undo-btn').style.display = 'inline-block';
+
         initGame();
     }
 
@@ -206,6 +220,7 @@
     }
 
     function initGame() {
+        if (gameInterval) clearInterval(gameInterval);
         const slotsDiv = document.getElementById('slots');
         slotsDiv.innerHTML = '';
         
@@ -223,7 +238,6 @@
             }
         });
 
-        // 明確篩選掉所有標點符號，只留下文字進行隨機分組
         const options = fullText.split('').filter(c => !puncRegex.test(c));
         const blockSize = 5;
         blocksData = [];
