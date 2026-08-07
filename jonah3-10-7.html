@@ -45,6 +45,9 @@
             font-size: 22px; font-weight: bold; border-radius: 8px;
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0;
         }
+        .tetris-word:hover {
+            background-color: #a0522d;
+        }
 
         .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .action-btn { padding: 8px 18px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
@@ -52,9 +55,17 @@
         #reset-btn { background: #ff5722; color: white; display: none; }
 
         #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 75vh; text-align: center; }
-        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        #home-screen h1 { color: #8b4513; font-size: 28px; margin-bottom: 20px; }
+        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .start-btn:hover { background-color: #219653; }
         
         #game-screen { display: none; width: 100%; }
+
+        @media screen and (max-width: 400px) {
+            .tetris-word { width: 42px; height: 42px; font-size: 19px; }
+            .slot { width: 26px; height: 26px; font-size: 13px; }
+            .punctuation { font-size: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -69,13 +80,18 @@
 
 <div id="game-screen" class="full-width">
     <h2>約拿書 3:10</h2>
+    
     <div class="action-container">
         <a href="https://youtube.com/shorts/T5KcTKX5WJM" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
+
     <div class="instruction">請點擊下方掉落下來的字，填入上方空格中</div>
+
     <div id="slots" class="grid-container"></div>
+    
     <div id="tetris-container"></div>
+    
     <div class="btn-group">
         <button id="undo-btn" class="action-btn" onclick="undoLast()">⟲ 更正</button>
         <button id="reset-btn" class="action-btn" onclick="resetGame()">再玩一次</button>
@@ -86,8 +102,11 @@
     const fullText = "於是，神察看他們的行為，見他們離開惡道，他就後悔，不把所說的災禍降與他們了。(約拿書3：10)";
     const puncRegex = /[\-，；。、（）：「」:()]/; 
     
-    let blocksData = [], activeBlock = null, gameInterval = null;
-    let seconds = 0, timerInterval = null;
+    let blocksData = []; 
+    let activeBlock = null; 
+    let gameInterval = null;
+
+    let seconds = 0, timerStarted = false, timerInterval = null;
 
     function formatTime(s) {
         const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -98,7 +117,6 @@
     function startGame() {
         document.getElementById('home-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
-        timerInterval = setInterval(() => { seconds++; document.getElementById('timer').innerText = formatTime(seconds); }, 1000);
         initGame();
     }
 
@@ -106,8 +124,8 @@
         if (gameInterval) clearInterval(gameInterval);
         if (timerInterval) clearInterval(timerInterval);
         seconds = 0;
+        timerStarted = false;
         document.getElementById('timer').innerText = formatTime(seconds);
-        timerInterval = setInterval(() => { seconds++; document.getElementById('timer').innerText = formatTime(seconds); }, 1000);
         
         document.getElementById('tetris-container').style.display = 'block';
         document.getElementById('reset-btn').style.display = 'none';
@@ -116,10 +134,68 @@
         initGame();
     }
 
+    function undoLast() {
+        const filled = document.querySelectorAll('.slot[id="filled"]');
+        if (filled.length > 0) {
+            const lastSlot = filled[filled.length - 1];
+            const charToReturn = lastSlot.dataset.char;
+            
+            lastSlot.textContent = "";
+            lastSlot.removeAttribute('id');
+            lastSlot.style.backgroundColor = "#fff";
+
+            if (activeBlock) {
+                activeBlock.chars.push(charToReturn);
+                updateBlockDOM(activeBlock.element, activeBlock.chars);
+            } else {
+                if (blocksData.length > 0) {
+                    blocksData[0].unshift(charToReturn);
+                } else {
+                    blocksData.push([charToReturn]);
+                    spawnNextBlock();
+                }
+            }
+        }
+    }
+
+    function showPreview() {
+        const slots = document.querySelectorAll('.empty-slot');
+        slots.forEach(slot => {
+            if (slot.id !== "filled") {
+                slot.textContent = slot.dataset.char;
+                slot.style.backgroundColor = "#e0d0b0";
+            }
+        });
+        setTimeout(() => {
+            slots.forEach(slot => {
+                if (slot.id !== "filled") {
+                    slot.textContent = "";
+                    slot.style.backgroundColor = "#fff";
+                }
+            });
+        }, 5000); 
+    }
+
+    function startTimerIfNeeded() {
+        if (!timerStarted) {
+            timerStarted = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                document.getElementById('timer').innerText = formatTime(seconds);
+            }, 1000);
+        }
+    }
+
     function initGame() {
+        if (timerInterval) clearInterval(timerInterval);
+        seconds = 0;
+        timerStarted = false;
+        document.getElementById('timer').innerText = formatTime(seconds);
+
         const slotsDiv = document.getElementById('slots');
         slotsDiv.innerHTML = '';
-        fullText.split('').forEach(char => {
+        
+        fullText.split('').forEach((char) => {
             if (puncRegex.test(char)) {
                 let punc = document.createElement('span');
                 punc.className = 'punctuation';
@@ -134,63 +210,133 @@
         });
 
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 7; // 設定掉落字數為 7 個
+        const blockSize = 7; // 每次掉落 7 個字
         blocksData = [];
         for (let i = 0; i < options.length; i += blockSize) {
-            let chunk = options.slice(i, i + blockSize);
-            chunk.sort(() => Math.random() - 0.5);
-            blocksData.push(chunk);
+            let blockChars = options.slice(i, i + blockSize);
+            blockChars.sort(() => Math.random() - 0.5); 
+            blocksData.push(blockChars);
         }
+
         spawnNextBlock();
     }
 
     function spawnNextBlock() {
         if (blocksData.length === 0) return;
+
         const container = document.getElementById('tetris-container');
-        container.innerHTML = '';
+        container.innerHTML = ''; 
+        
         let chars = blocksData.shift();
+        
         let blockDiv = document.createElement('div');
         blockDiv.className = 'tetris-block';
         
-        function render() {
+        function renderChars() {
             blockDiv.innerHTML = '';
-            chars.forEach(char => {
+            chars.forEach((char) => {
                 let wordDiv = document.createElement('div');
                 wordDiv.className = 'tetris-word';
                 wordDiv.textContent = char;
-                wordDiv.onclick = (e) => {
+                
+                wordDiv.onclick = function(e) {
                     e.stopPropagation();
-                    let target = document.querySelector('.empty-slot:not([id="filled"])');
-                    if (target && char === target.dataset.char) {
-                        target.textContent = char;
-                        target.id = "filled";
-                        target.style.backgroundColor = "#fff";
-                        chars.splice(chars.indexOf(char), 1);
+                    startTimerIfNeeded(); // 點選第一個字時才開始計時
+                    let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                    if (targetSlot && char === targetSlot.dataset.char) {
+                        targetSlot.textContent = char;
+                        targetSlot.id = "filled";
+                        targetSlot.style.backgroundColor = "#fff";
+                        
+                        const charIndex = chars.indexOf(char);
+                        if (charIndex > -1) chars.splice(charIndex, 1);
+                        
                         if (chars.length === 0) {
+                            if (gameInterval) clearInterval(gameInterval);
                             blockDiv.remove();
-                            spawnNextBlock();
-                        } else render();
-                        if (!document.querySelector('.empty-slot:not([id="filled"])')) finish();
+                            activeBlock = null;
+                            spawnNextBlock(); 
+                        } else {
+                            renderChars();
+                        }
+
+                        if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) {
+                            finish();
+                        }
                     }
                 };
                 blockDiv.appendChild(wordDiv);
             });
         }
-        render();
+
+        renderChars();
         container.appendChild(blockDiv);
+
         let currentY = -60;
-        activeBlock = { element: blockDiv, chars: chars };
+        let targetY = 35; 
+        blockDiv.style.top = currentY + 'px';
+
+        activeBlock = {
+            element: blockDiv,
+            chars: chars
+        };
+
+        if (gameInterval) clearInterval(gameInterval);
         gameInterval = setInterval(() => {
-            currentY += 4;
-            blockDiv.style.top = currentY + 'px';
-            if (currentY >= 35) clearInterval(gameInterval);
+            if (currentY < targetY) {
+                currentY += 4; 
+                blockDiv.style.top = currentY + 'px';
+            } else {
+                clearInterval(gameInterval);
+            }
         }, 30);
     }
 
+    function updateBlockDOM(blockDiv, chars) {
+        blockDiv.innerHTML = '';
+        chars.forEach((char) => {
+            let wordDiv = document.createElement('div');
+            wordDiv.className = 'tetris-word';
+            wordDiv.textContent = char;
+            
+            wordDiv.onclick = function(e) {
+                e.stopPropagation();
+                startTimerIfNeeded();
+                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                if (targetSlot && char === targetSlot.dataset.char) {
+                    targetSlot.textContent = char;
+                    targetSlot.id = "filled";
+                    targetSlot.style.backgroundColor = "#fff";
+                    
+                    const charIndex = chars.indexOf(char);
+                    if (charIndex > -1) chars.splice(charIndex, 1);
+                    
+                    if (chars.length === 0) {
+                        blockDiv.remove();
+                        activeBlock = null;
+                        spawnNextBlock();
+                    } else {
+                        updateBlockDOM(blockDiv, chars);
+                    }
+
+                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) {
+                        finish();
+                    }
+                }
+            };
+            blockDiv.appendChild(wordDiv);
+        });
+    }
+
     function finish() {
-        clearInterval(gameInterval);
-        clearInterval(timerInterval);
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("太棒了"));
+        if (gameInterval) clearInterval(gameInterval);
+        if (timerInterval) clearInterval(timerInterval); // 遊戲完成時停止計時
+        if (activeBlock && activeBlock.element) activeBlock.element.remove();
+        
+        const msg = new SpeechSynthesisUtterance("太棒了");
+        msg.lang = 'zh-TW';
+        window.speechSynthesis.speak(msg);
+        
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
         document.getElementById('reset-btn').style.display = 'inline-block';
         document.getElementById('undo-btn').style.display = 'none';
