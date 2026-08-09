@@ -3,49 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經拼圖 - 馬太福音 5:3~10 (闖關版)</title>
+    <title>聖經拼圖 - 天國八福</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; overflow-x: hidden; box-sizing: border-box; }
         .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 5px; }
         
-        #timer { 
-            position: fixed; top: 15px; right: 15px; font-size: 18px; font-weight: bold; 
-            color: #8b4513; background: white; padding: 5px 10px; border-radius: 10px; 
-            border: 2px solid #8b4513; z-index: 1000;
-        }
-
+        #timer { position: fixed; top: 15px; right: 15px; font-size: 18px; font-weight: bold; color: #8b4513; background: white; padding: 5px 10px; border-radius: 10px; border: 2px solid #8b4513; z-index: 1000; }
         h2 { color: #8b4513; margin: 8px 0; font-size: 20px; }
-        
         .action-container { margin: 8px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 6px 12px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
         .preview-btn { padding: 6px 12px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
         
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 8px 0; align-items: center; }
-        .slot { width: 28px; height: 28px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 14px; color: #333; }
-        
+        .slot { width: 26px; height: 26px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 13px; color: #333; }
         .punctuation { font-size: 14px; font-weight: bold; color: #5d6d7e; margin: 0 1px; }
         .instruction { color: #5d6d7e; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
         
-        #tetris-container {
-            width: 100%; max-width: 100%; height: 110px; background-color: #ffffff;
-            border-radius: 8px; position: relative; overflow: hidden; margin-top: 5px;
-            border: 2px solid #8b4513; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .tetris-block {
-            position: absolute; display: flex; gap: 4px; justify-content: center; left: 50%;
-            transform: translateX(-50%); transition: top 0.05s linear; width: 95%;
-        }
-
-        .tetris-word {
-            width: 40px; height: 40px; background-color: #8b4513; color: #ffffff;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            font-size: 18px; font-weight: bold; border-radius: 6px;
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0;
-        }
+        #tetris-container { width: 100%; max-width: 100%; height: 110px; background-color: #ffffff; border-radius: 8px; position: relative; overflow: hidden; margin-top: 5px; border: 2px solid #8b4513; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .tetris-block { position: absolute; display: flex; gap: 4px; justify-content: center; left: 50%; transform: translateX(-50%); transition: top 0.05s linear; width: 95%; }
+        .tetris-word { width: 38px; height: 38px; background-color: #8b4513; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 6px; box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0; }
         .tetris-word:hover { background-color: #a0522d; }
-
+        
         .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .action-btn { padding: 8px 18px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
         #undo-btn { background: #f39c12; color: white; }
@@ -53,19 +32,9 @@
         #next-stage-btn { background: #27ae60; color: white; display: none; }
 
         #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 75vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 15px; }
-        .stage-select { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; margin-top: 10px; }
-        .start-btn { padding: 12px 20px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .start-btn:hover { background-color: #219653; }
-        .start-btn.part2 { background-color: #2980b9; }
-        .start-btn.part2:hover { background-color: #1f618d; }
-        
+        .stage-select { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 10px; }
+        .start-btn { padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; }
         #game-screen { display: none; width: 100%; }
-
-        @media screen and (max-width: 400px) {
-            .tetris-word { width: 36px; height: 36px; font-size: 16px; }
-            .slot { width: 24px; height: 24px; font-size: 12px; }
-        }
     </style>
 </head>
 <body>
@@ -73,58 +42,42 @@
 <div id="timer">時間：00:00</div>
 
 <div id="home-screen" class="full-width">
-    <h1>📖 聖經拼圖遊戲</h1>
-    <p class="instruction" style="font-size: 16px; margin-bottom: 20px;">馬太福音 5:3~10</p>
+    <h1>📖 天國八福拼圖</h1>
     <div class="stage-select">
-        <button class="start-btn" onclick="startStage(1)">第一段 (5:3-6)</button>
-        <button class="start-btn part2" onclick="startStage(2)">第二段 (5:7-10)</button>
+        <button class="start-btn" style="background-color: #27ae60;" onclick="startStage(1)">第一段 (3-4節)</button>
+        <button class="start-btn" style="background-color: #2980b9;" onclick="startStage(2)">第二段 (5-7節)</button>
+        <button class="start-btn" style="background-color: #8e44ad;" onclick="startStage(3)">第三段 (8-10節)</button>
     </div>
 </div>
 
 <div id="game-screen" class="full-width">
-    <h2 id="stage-title">馬太福音 5:3~10</h2>
-    
+    <h2 id="stage-title">天國八福</h2>
     <div class="action-container">
         <a id="yt-link-btn" href="" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
-
     <div class="instruction">請點選下方框框裡的字，正確的字會出現在上方的空格中</div>
-
     <div id="slots" class="grid-container"></div>
-    
     <div id="tetris-container"></div>
-    
     <div class="btn-group">
         <button id="undo-btn" class="action-btn" onclick="undoLast()">⟲ 更正</button>
         <button id="reset-btn" class="action-btn" onclick="resetGame()">再玩一次</button>
-        <button id="next-stage-btn" class="action-btn" onclick="goToNextStage()">進入下一段 ➡</button>
-        <button class="action-btn" style="background: #7f8c8d; color: white;" onclick="goHome()">🏠 回首頁</button>
+        <button id="next-stage-btn" class="action-btn" onclick="goToNextStage()">下一段 ➡</button>
+        <button class="action-btn" style="background: #7f8c8d;" onclick="goHome()">🏠 回首頁</button>
     </div>
 </div>
 
 <script>
     const stages = {
-        1: {
-            title: "馬太福音 5:3-6 (第一段)",
-            text: "虛心的人有福了，因為天國是他們的。哀慟的人有福了，因為他們必得安慰。溫柔的人有福了，因為他們必承受地土。飢渴慕義的人有福了，因為他們必得飽足。(馬太福音5：3~6)",
-            url: "https://youtu.be/V_Ce-oaddIU?si=SnEJaCk2zxPNXwzj"
-        },
-        2: {
-            title: "馬太福音 5:7-10 (第二段)",
-            text: "憐憫人的人有福了，因為他們必蒙憐憫。清心的人有福了，因為他們必得見神。使人和睦的人有福了，因為他們必稱為神的兒子。為義受逼迫的人有福了，因為天國是他們的。(馬太福音5：7~10)",
-            url: "https://youtu.be/V_Ce-oaddIU?si=SnEJaCk2zxPNXwzj"
-        }
+        1: { title: "馬太福音 5:3-4", text: "虛心的人有福了，因為天國是他們的。哀慟的人有福了，因為他們必得安慰。", url: "https://youtu.be/V_Ce-oaddIU?si=SnEJaCk2zxPNXwzj" },
+        2: { title: "馬太福音 5:5-7", text: "溫柔的人有福了，因為他們必承受地土。飢渴慕義的人有福了，因為他們必得飽足。憐憫人的人有福了，因為他們必蒙憐憫。", url: "https://youtu.be/V_Ce-oaddIU?si=SnEJaCk2zxPNXwzj" },
+        3: { title: "馬太福音 5:8-10", text: "清心的人有福了，因為他們必得見神。使人和睦的人有福了，因為他們必稱為神的兒子。為義受逼迫的人有福了，因為天國是他們的。(馬太福音5：3~10)", url: "https://youtu.be/V_Ce-oaddIU?si=SnEJaCk2zxPNXwzj" }
     };
 
     let currentStage = 1;
     let fullText = "";
     const puncRegex = /[\-，；。、（）：「」:()~]/; 
-    
-    let blocksData = []; 
-    let activeBlock = null; 
-    let gameInterval = null;
-    let seconds = 0, timerStarted = false, timerInterval = null;
+    let blocksData = [], activeBlock = null, gameInterval = null, seconds = 0, timerStarted = false, timerInterval = null;
 
     function formatTime(s) {
         const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -135,29 +88,23 @@
     function startStage(stageNum) {
         currentStage = stageNum;
         fullText = stages[stageNum].text;
-        
         document.getElementById('stage-title').innerText = stages[stageNum].title;
         document.getElementById('yt-link-btn').href = stages[stageNum].url;
-
         document.getElementById('home-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
         initGame();
     }
 
     function goHome() {
-        if (gameInterval) clearInterval(gameInterval);
-        if (timerInterval) clearInterval(timerInterval);
+        clearInterval(gameInterval); clearInterval(timerInterval);
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('home-screen').style.display = 'flex';
     }
 
     function resetGame() {
-        if (gameInterval) clearInterval(gameInterval);
-        if (timerInterval) clearInterval(timerInterval);
-        seconds = 0;
-        timerStarted = false;
+        clearInterval(gameInterval); clearInterval(timerInterval);
+        seconds = 0; timerStarted = false;
         document.getElementById('timer').innerText = formatTime(seconds);
-        
         document.getElementById('tetris-container').style.display = 'block';
         document.getElementById('reset-btn').style.display = 'none';
         document.getElementById('next-stage-btn').style.display = 'none';
@@ -167,11 +114,8 @@
     }
 
     function goToNextStage() {
-        if (currentStage === 1) {
-            startStage(2);
-        } else {
-            goHome();
-        }
+        if (currentStage < 3) startStage(currentStage + 1);
+        else goHome();
     }
 
     function undoLast() {
@@ -227,11 +171,10 @@
     }
 
     function initGame() {
-        if (timerInterval) clearInterval(timerInterval);
-        seconds = 0;
-        timerStarted = false;
+        clearInterval(timerInterval);
+        seconds = 0; timerStarted = false;
         document.getElementById('timer').innerText = formatTime(seconds);
-
+        
         document.getElementById('tetris-container').style.display = 'block';
         document.getElementById('reset-btn').style.display = 'none';
         document.getElementById('next-stage-btn').style.display = 'none';
@@ -255,25 +198,21 @@
         });
 
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 7; 
         blocksData = [];
-        for (let i = 0; i < options.length; i += blockSize) {
-            let blockChars = options.slice(i, i + blockSize);
-            blockChars.sort(() => Math.random() - 0.5); 
-            blocksData.push(blockChars);
+        for (let i = 0; i < options.length; i += 7) {
+            let b = options.slice(i, i + 7);
+            b.sort(() => Math.random() - 0.5); 
+            blocksData.push(b);
         }
-
         spawnNextBlock();
     }
 
     function spawnNextBlock() {
         if (blocksData.length === 0) return;
-
         const container = document.getElementById('tetris-container');
         container.innerHTML = ''; 
         
         let chars = blocksData.shift();
-        
         let blockDiv = document.createElement('div');
         blockDiv.className = 'tetris-block';
         
@@ -297,7 +236,7 @@
                         if (charIndex > -1) chars.splice(charIndex, 1);
                         
                         if (chars.length === 0) {
-                            if (gameInterval) clearInterval(gameInterval);
+                            clearInterval(gameInterval);
                             blockDiv.remove();
                             activeBlock = null;
                             spawnNextBlock(); 
@@ -320,10 +259,9 @@
         let currentY = -60;
         let targetY = 30; 
         blockDiv.style.top = currentY + 'px';
-
         activeBlock = { element: blockDiv, chars: chars };
 
-        if (gameInterval) clearInterval(gameInterval);
+        clearInterval(gameInterval);
         gameInterval = setInterval(() => {
             if (currentY < targetY) {
                 currentY += 4; 
@@ -371,8 +309,8 @@
     }
 
     function finish() {
-        if (gameInterval) clearInterval(gameInterval);
-        if (timerInterval) clearInterval(timerInterval);
+        clearInterval(gameInterval);
+        clearInterval(timerInterval);
         if (activeBlock && activeBlock.element) activeBlock.element.remove();
         
         const msg = new SpeechSynthesisUtterance("太棒了");
@@ -381,7 +319,7 @@
         
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
         document.getElementById('reset-btn').style.display = 'inline-block';
-        if (currentStage === 1) {
+        if (currentStage < 3) {
             document.getElementById('next-stage-btn').style.display = 'inline-block';
         }
         document.getElementById('undo-btn').style.display = 'none';
