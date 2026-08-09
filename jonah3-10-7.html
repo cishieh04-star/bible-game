@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經拼圖 - 約拿書 3:10 (俄羅斯方塊掉落版)</title>
+    <title>聖經拼圖 - 約拿書 3:10</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; overflow-x: hidden; box-sizing: border-box; }
         .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 5px; }
         
-        /* 右上角計時器 */
         #timer { 
             position: fixed; top: 15px; right: 15px; font-size: 18px; font-weight: bold; 
             color: #8b4513; background: white; padding: 5px 10px; border-radius: 10px; 
@@ -45,9 +44,7 @@
             font-size: 22px; font-weight: bold; border-radius: 8px;
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0;
         }
-        .tetris-word:hover {
-            background-color: #a0522d;
-        }
+        .tetris-word:hover { background-color: #a0522d; }
 
         .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .action-btn { padding: 8px 18px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
@@ -86,7 +83,7 @@
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
 
-    <div class="instruction">請點擊下方掉落下來的字，填入上方空格中</div>
+    <div class="instruction">請點選下方框框裡的字，正確的字會出現在上方的空格中</div>
 
     <div id="slots" class="grid-container"></div>
     
@@ -105,7 +102,6 @@
     let blocksData = []; 
     let activeBlock = null; 
     let gameInterval = null;
-
     let seconds = 0, timerStarted = false, timerInterval = null;
 
     function formatTime(s) {
@@ -210,7 +206,7 @@
         });
 
         const options = fullText.split('').filter(c => !puncRegex.test(c));
-        const blockSize = 7; // 每次掉落 7 個字
+        const blockSize = 7; 
         blocksData = [];
         for (let i = 0; i < options.length; i += blockSize) {
             let blockChars = options.slice(i, i + blockSize);
@@ -241,7 +237,7 @@
                 
                 wordDiv.onclick = function(e) {
                     e.stopPropagation();
-                    startTimerIfNeeded(); // 點選第一個字時才開始計時
+                    startTimerIfNeeded();
                     let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
                     if (targetSlot && char === targetSlot.dataset.char) {
                         targetSlot.textContent = char;
@@ -276,10 +272,7 @@
         let targetY = 35; 
         blockDiv.style.top = currentY + 'px';
 
-        activeBlock = {
-            element: blockDiv,
-            chars: chars
-        };
+        activeBlock = { element: blockDiv, chars: chars };
 
         if (gameInterval) clearInterval(gameInterval);
         gameInterval = setInterval(() => {
@@ -330,7 +323,7 @@
 
     function finish() {
         if (gameInterval) clearInterval(gameInterval);
-        if (timerInterval) clearInterval(timerInterval); // 遊戲完成時停止計時
+        if (timerInterval) clearInterval(timerInterval);
         if (activeBlock && activeBlock.element) activeBlock.element.remove();
         
         const msg = new SpeechSynthesisUtterance("太棒了");
