@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經拼圖 - 約翰福音 13:34</title>
+    <title>聖經拼圖 - 約翰壹書 4:19</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -70,15 +70,15 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p style="font-size: 18px; margin-bottom: 20px;">約翰福音 13:34</p>
+    <p style="font-size: 18px; margin-bottom: 20px;">約翰壹書 4:19</p>
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
 <div id="game-screen" class="full-width">
-    <h2>約翰福音 13:34</h2>
+    <h2>約翰壹書 4:19</h2>
     
     <div class="action-container">
-        <a href="https://youtube.com/shorts/DdqmCSPgQNk" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+        <a href="https://youtube.com/shorts/u0d5AmK25vU" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
 
@@ -95,9 +95,8 @@
 </div>
 
 <script>
-    // 經文中的空格已清除乾淨
-    const fullText = "我賜給你們一條新命令，乃是叫你們彼此相愛；我怎樣愛你們，你們也要怎樣相愛。(約翰福音13:34)";
-    const puncRegex = /[\-，；。、（）：「」:()?？ ]/; 
+    const fullText = "我們愛，因為神先愛我們。(約翰壹書 4:19)";
+    const puncRegex = /[\-，；。、（）：「」:()?？]/; 
     
     let blocksData = []; 
     let activeBlock = null; 
@@ -152,7 +151,7 @@
             }
         });
 
-        const options = fullText.split('').filter(c => !puncRegex.test(c));
+        const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== ' ');
         const blockSize = 6; 
         blocksData = [];
         for (let i = 0; i < options.length; i += blockSize) {
