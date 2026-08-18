@@ -78,7 +78,7 @@
     <h2>約翰壹書 4:19</h2>
     
     <div class="action-container">
-        <a href="https://youtube.com/shorts/6MHZwRTEs60" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+        <a href="https://youtube.com/shorts/u0d5AmK25vU" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
 
@@ -95,7 +95,9 @@
 </div>
 
 <script>
-    const fullText = "我們愛，因為神先愛我們。(約翰壹書 4:19)";
+    // 經文內容已預先移除所有空格，確保不會產生多餘的虛線框
+    const rawText = "我們愛，因為神先愛我們。(約翰壹書4:19)";
+    const fullText = rawText.replace(/\s+/g, ''); // 強制移除經文中所有隱藏空格
     const puncRegex = /[\-，；。、（）：「」:()?？]/; 
     
     let blocksData = []; 
@@ -151,7 +153,8 @@
             }
         });
 
-        const options = fullText.split('').filter(c => !puncRegex.test(c) && c !== ' ');
+        // 掉落區僅取純文字與數字，自動避開標點符號
+        const options = fullText.split('').filter(c => !puncRegex.test(c));
         const blockSize = 6; 
         blocksData = [];
         for (let i = 0; i < options.length; i += blockSize) {
