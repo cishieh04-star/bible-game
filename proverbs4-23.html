@@ -24,6 +24,9 @@
 
         h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
         
+        /* 增加經文樣式 */
+        .verse-display { font-size: 18px; color: #5d6d7e; margin: 20px 0; font-weight: bold; line-height: 1.6; }
+        
         .action-container { margin: 10px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 6px 12px; background: #FF0000; color: white; border-radius: 5px; font-size: 13px; font-weight: bold; }
         .preview-btn { padding: 6px 12px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; }
@@ -58,7 +61,7 @@
         #reset-btn { background: #ff5722; color: white; display: none; }
 
         #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 20px; }
+        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 15px; }
         .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
         
         #game-screen { display: none; width: 100%; }
@@ -70,7 +73,11 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p style="font-size: 18px; margin-bottom: 20px;">箴言 4:23</p>
+    <!-- 新增首頁經文與出處 -->
+    <div class="verse-display">
+        「你要保守你心，勝過保守一切。」<br>
+        (箴言 4:23)
+    </div>
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
@@ -95,7 +102,7 @@
 </div>
 
 <script>
-    const fullText = "你要保守你心，勝過保守一切。(箴言4:23)";
+    const fullText = "你要保守你心，勝過保守一切。(箴言4:23)".replace(/\s+/g, '');
     const puncRegex = /[\-，；。、（）：「」:()?？]/; 
     
     let blocksData = []; 
@@ -110,7 +117,6 @@
     }
 
     function startGame() {
-        // 預先觸發一次語音引擎初始化，確保後續可用
         window.speechSynthesis.cancel();
         document.getElementById('home-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
@@ -266,7 +272,6 @@
         if (timerInterval) clearInterval(timerInterval);
         if (activeBlock && activeBlock.element) activeBlock.element.remove();
         
-        // 播放「太棒了」
         const msg = new SpeechSynthesisUtterance("太棒了");
         msg.lang = 'zh-TW';
         window.speechSynthesis.speak(msg);
