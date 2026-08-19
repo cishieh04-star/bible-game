@@ -57,9 +57,34 @@
         #undo-btn { background: #f39c12; color: white; }
         #reset-btn { background: #ff5722; color: white; display: none; }
 
-        #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 20px; }
-        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; padding: 20px; }
+        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 15px; }
+        
+        /* 聖經經文卡片樣式 */
+        .verse-card {
+            background-color: #fffdf9;
+            border: 2px solid #e6dbb9;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            max-width: 450px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .verse-text {
+            font-size: 16px;
+            color: #5c4033;
+            line-height: 1.6;
+            margin: 0 0 8px 0;
+        }
+        .verse-ref {
+            font-size: 14px;
+            color: #8b4513;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .start-btn:hover { background-color: #219653; }
         
         #game-screen { display: none; width: 100%; }
     </style>
@@ -70,7 +95,13 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p style="font-size: 18px; margin-bottom: 20px;">以弗所書 4:32</p>
+    
+    <!-- 新增的聖經經文與出處區塊 -->
+    <div class="verse-card">
+        <p class="verse-text">「並要以恩慈相待，存憐憫的心，彼此饒恕。」</p>
+        <p class="verse-ref">—— 以弗所書 4:32</p>
+    </div>
+
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
