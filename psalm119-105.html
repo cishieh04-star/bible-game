@@ -22,6 +22,20 @@
             border: 2px solid #8b4513; z-index: 1000;
         }
 
+        /* 經文區塊優化：支援跨裝置自適應 */
+        .verse-box {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e6c27e;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .verse-text { font-size: 20px; font-weight: bold; color: #5d4037; margin-bottom: 10px; line-height: 1.5; }
+        .verse-ref { font-size: 16px; color: #8b4513; font-weight: bold; }
+
         h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
         
         .action-container { margin: 10px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
@@ -58,10 +72,15 @@
         #reset-btn { background: #ff5722; color: white; display: none; }
 
         #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 20px; }
-        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 10px; }
+        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
         #game-screen { display: none; width: 100%; }
+        
+        /* 手機螢幕優化 */
+        @media screen and (max-width: 400px) {
+            .verse-text { font-size: 17px; }
+        }
     </style>
 </head>
 <body>
@@ -70,7 +89,13 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p style="font-size: 18px; margin-bottom: 20px;">詩篇 119:105</p>
+    
+    <!-- 經文顯示區塊 -->
+    <div class="verse-box">
+        <div class="verse-text">「祢的話是我腳前的燈，是我路上的光。」</div>
+        <div class="verse-ref">— 詩篇 119:105</div>
+    </div>
+
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
@@ -264,11 +289,6 @@
         if (gameInterval) clearInterval(gameInterval);
         if (timerInterval) clearInterval(timerInterval);
         if (activeBlock && activeBlock.element) activeBlock.element.remove();
-        
-        const msg = new SpeechSynthesisUtterance("太棒了");
-        msg.lang = 'zh-TW';
-        window.speechSynthesis.speak(msg);
-        
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
         document.getElementById('reset-btn').style.display = 'inline-block';
         document.getElementById('undo-btn').style.display = 'none';
