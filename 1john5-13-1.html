@@ -6,62 +6,79 @@
     <title>聖經拼圖 - 約翰壹書 5:13</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; overflow-x: hidden; box-sizing: border-box; }
-        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 5px; }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Microsoft JhengHei', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 10px; background-color: #fdf6e3; margin: 0; 
+            min-height: 100vh; position: relative; overflow-x: hidden; 
+            touch-action: manipulation;
+        }
+        .full-width { width: 100%; max-width: 600px; text-align: center; }
         
         #timer { 
-            position: fixed; top: 15px; right: 15px; font-size: 18px; font-weight: bold; 
+            position: fixed; top: 15px; right: 15px; font-size: 16px; font-weight: bold; 
             color: #8b4513; background: white; padding: 5px 10px; border-radius: 10px; 
             border: 2px solid #8b4513; z-index: 1000;
         }
 
-        h2 { color: #8b4513; margin: 8px 0; font-size: 22px; }
+        /* 經文區塊樣式 (確保在各裝置清晰顯示) */
+        .verse-box {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e6c27e;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .verse-text { font-size: 19px; font-weight: bold; color: #5d4037; margin-bottom: 10px; line-height: 1.5; }
+        .verse-ref { font-size: 15px; color: #8b4513; font-weight: bold; }
+
+        h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
         
-        .action-container { margin: 8px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .yt-link { text-decoration: none; padding: 6px 12px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
-        .preview-btn { padding: 6px 12px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .action-container { margin: 10px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .yt-link { text-decoration: none; padding: 6px 12px; background: #FF0000; color: white; border-radius: 5px; font-size: 13px; font-weight: bold; }
+        .preview-btn { padding: 6px 12px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; }
         
-        .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 10px 0; align-items: center; }
-        .slot { width: 30px; height: 30px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 15px; color: #333; }
+        .grid-container { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin: 15px 0; align-items: center; }
+        .slot { width: 28px; height: 28px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 5px; font-weight: bold; font-size: 14px; color: #333; }
         
         .punctuation { font-size: 16px; font-weight: bold; color: #5d6d7e; margin: 0 1px; }
-        .instruction { color: #5d6d7e; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
+        .instruction { color: #5d6d7e; margin-bottom: 10px; font-weight: bold; font-size: 14px; }
         
         #tetris-container {
-            width: 100%; max-width: 100%; height: 120px; background-color: #ffffff;
-            border-radius: 8px; position: relative; overflow: hidden; margin-top: 5px;
+            width: 100%; max-width: 500px; height: 120px; background-color: #ffffff;
+            border-radius: 8px; position: relative; overflow: hidden; margin-top: 10px;
             border: 2px solid #8b4513; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .tetris-block {
-            position: absolute; display: flex; gap: 6px; justify-content: center; left: 50%;
+            position: absolute; display: flex; gap: 4px; justify-content: center; left: 50%;
             transform: translateX(-50%); transition: top 0.05s linear; width: 95%;
         }
 
         .tetris-word {
-            width: 48px; height: 48px; background-color: #8b4513; color: #ffffff;
+            width: 40px; height: 40px; background-color: #8b4513; color: #ffffff;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            font-size: 22px; font-weight: bold; border-radius: 8px;
+            font-size: 18px; font-weight: bold; border-radius: 6px;
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0;
         }
-        .tetris-word:hover { background-color: #a0522d; }
 
-        .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .action-btn { padding: 8px 18px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .action-btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
         #undo-btn { background: #f39c12; color: white; }
         #reset-btn { background: #ff5722; color: white; display: none; }
 
-        #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 75vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 28px; margin-bottom: 20px; }
-        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .start-btn:hover { background-color: #219653; }
+        #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
+        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 10px; }
+        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
         #game-screen { display: none; width: 100%; }
-
+        
         @media screen and (max-width: 400px) {
-            .tetris-word { width: 42px; height: 42px; font-size: 19px; }
-            .slot { width: 26px; height: 26px; font-size: 13px; }
-            .punctuation { font-size: 14px; }
+            .verse-text { font-size: 17px; }
         }
     </style>
 </head>
@@ -71,7 +88,13 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p class="instruction" style="font-size: 18px; margin-bottom: 30px;">約翰壹書 5:13</p>
+    
+    <!-- 經文顯示區塊 -->
+    <div class="verse-box">
+        <div class="verse-text">「我將這些話寫給你們信奉神兒子之名的人，要叫你們知道自己有永生。」</div>
+        <div class="verse-ref">— 約翰壹書 5:13</div>
+    </div>
+
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
