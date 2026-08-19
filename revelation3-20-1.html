@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經拼圖 - 約翰壹書 5:13</title>
+    <title>聖經拼圖 - 啟示錄 3:20</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -22,18 +22,18 @@
             border: 2px solid #8b4513; z-index: 1000;
         }
 
-        /* 經文卡片樣式 */
-        .verse-card {
-            background-color: #fff8e1;
-            border: 2px solid #e6c27e;
-            border-radius: 15px;
+        /* 經文區塊優化 (支援跨裝置自適應) */
+        .verse-box {
+            background: #fff8e1;
             padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e6c27e;
             margin: 20px auto;
             width: 90%;
             max-width: 450px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .verse-text { font-size: 19px; font-weight: bold; color: #5d4037; line-height: 1.5; margin-bottom: 10px; }
+        .verse-text { font-size: 19px; font-weight: bold; color: #5d4037; margin-bottom: 10px; line-height: 1.5; }
         .verse-ref { font-size: 15px; color: #8b4513; font-weight: bold; }
 
         h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
@@ -76,7 +76,7 @@
         .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
         #game-screen { display: none; width: 100%; }
-
+        
         @media screen and (max-width: 400px) {
             .verse-text { font-size: 17px; }
         }
@@ -89,20 +89,20 @@
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
     
-    <!-- 經文卡片區塊 -->
-    <div class="verse-card">
-        <p class="verse-text">「我將這些話寫給你們信奉神兒子之名的人，要叫你們知道自己有永生。」</p>
-        <p class="verse-ref">— 約翰壹書 5:13</p>
+    <!-- 經文顯示區塊 -->
+    <div class="verse-box">
+        <div class="verse-text">「看哪，我站在門外叩門，若有聽見我聲音就開門的，我要進到他那裡去，我與他、他與我一同坐席。」</div>
+        <div class="verse-ref">— 啟示錄 3:20</div>
     </div>
 
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
 <div id="game-screen" class="full-width">
-    <h2>約翰壹書 5:13</h2>
+    <h2>啟示錄 3:20</h2>
     
     <div class="action-container">
-        <a href="https://www.youtube.com/shorts/xZnBNytS8iE" target="_blank" class="yt-link">🎥 觀看複習影片</a>
+        <a href="https://www.youtube.com/shorts/kaJ-Fud92B8" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
     </div>
 
@@ -119,7 +119,7 @@
 </div>
 
 <script>
-    const fullText = "我將這些話寫給你們信奉神兒子之名的人，要叫你們知道自己有永生。(約翰壹書5：13)";
+    const fullText = "看哪，我站在門外叩門，若有聽見我聲音就開門的，我要進到他那裡去，我與他、他與我一同坐席。(啟示錄3：20)";
     const puncRegex = /[\-，；。、（）：「」:()]/; 
     
     let blocksData = []; 
@@ -151,58 +151,6 @@
         document.getElementById('undo-btn').style.display = 'inline-block';
         if (activeBlock && activeBlock.element) activeBlock.element.remove();
         initGame();
-    }
-
-    function undoLast() {
-        const filled = document.querySelectorAll('.slot[id="filled"]');
-        if (filled.length > 0) {
-            const lastSlot = filled[filled.length - 1];
-            const charToReturn = lastSlot.dataset.char;
-            
-            lastSlot.textContent = "";
-            lastSlot.removeAttribute('id');
-            lastSlot.style.backgroundColor = "#fff";
-
-            if (activeBlock) {
-                activeBlock.chars.push(charToReturn);
-                updateBlockDOM(activeBlock.element, activeBlock.chars);
-            } else {
-                if (blocksData.length > 0) {
-                    blocksData[0].unshift(charToReturn);
-                } else {
-                    blocksData.push([charToReturn]);
-                    spawnNextBlock();
-                }
-            }
-        }
-    }
-
-    function showPreview() {
-        const slots = document.querySelectorAll('.empty-slot');
-        slots.forEach(slot => {
-            if (slot.id !== "filled") {
-                slot.textContent = slot.dataset.char;
-                slot.style.backgroundColor = "#e0d0b0";
-            }
-        });
-        setTimeout(() => {
-            slots.forEach(slot => {
-                if (slot.id !== "filled") {
-                    slot.textContent = "";
-                    slot.style.backgroundColor = "#fff";
-                }
-            });
-        }, 5000); 
-    }
-
-    function startTimerIfNeeded() {
-        if (!timerStarted) {
-            timerStarted = true;
-            timerInterval = setInterval(() => {
-                seconds++;
-                document.getElementById('timer').innerText = formatTime(seconds);
-            }, 1000);
-        }
     }
 
     function initGame() {
@@ -308,6 +256,30 @@
         }, 30);
     }
 
+    function undoLast() {
+        const filled = document.querySelectorAll('.slot[id="filled"]');
+        if (filled.length > 0) {
+            const lastSlot = filled[filled.length - 1];
+            const charToReturn = lastSlot.dataset.char;
+            
+            lastSlot.textContent = "";
+            lastSlot.removeAttribute('id');
+            lastSlot.style.backgroundColor = "#fff";
+
+            if (activeBlock) {
+                activeBlock.chars.push(charToReturn);
+                updateBlockDOM(activeBlock.element, activeBlock.chars);
+            } else {
+                if (blocksData.length > 0) {
+                    blocksData[0].unshift(charToReturn);
+                } else {
+                    blocksData.push([charToReturn]);
+                    spawnNextBlock();
+                }
+            }
+        }
+    }
+
     function updateBlockDOM(blockDiv, chars) {
         blockDiv.innerHTML = '';
         chars.forEach((char) => {
@@ -342,6 +314,34 @@
             };
             blockDiv.appendChild(wordDiv);
         });
+    }
+
+    function showPreview() {
+        const slots = document.querySelectorAll('.empty-slot');
+        slots.forEach(slot => {
+            if (slot.id !== "filled") {
+                slot.textContent = slot.dataset.char;
+                slot.style.backgroundColor = "#e0d0b0";
+            }
+        });
+        setTimeout(() => {
+            slots.forEach(slot => {
+                if (slot.id !== "filled") {
+                    slot.textContent = "";
+                    slot.style.backgroundColor = "#fff";
+                }
+            });
+        }, 5000); 
+    }
+
+    function startTimerIfNeeded() {
+        if (!timerStarted) {
+            timerStarted = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                document.getElementById('timer').innerText = formatTime(seconds);
+            }, 1000);
+        }
     }
 
     function finish() {
