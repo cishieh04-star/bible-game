@@ -22,6 +22,19 @@
             border: 2px solid #8b4513; z-index: 1000;
         }
 
+        /* 經文區塊樣式 - 確保RWD */
+        .verse-box {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e6c27e;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 450px;
+        }
+        .verse-text { font-size: 19px; font-weight: bold; color: #5d4037; margin-bottom: 10px; line-height: 1.5; }
+        .verse-ref { font-size: 15px; color: #8b4513; font-weight: bold; }
+
         h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
         
         .action-container { margin: 10px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
@@ -58,8 +71,8 @@
         #reset-btn { background: #ff5722; color: white; display: none; }
 
         #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 20px; }
-        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 10px; }
+        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
         #game-screen { display: none; width: 100%; }
     </style>
@@ -70,7 +83,13 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p style="font-size: 18px; margin-bottom: 20px;">約翰福音 13:34</p>
+    
+    <!-- 經文顯示區塊 -->
+    <div class="verse-box">
+        <div class="verse-text">「我賜給你們一條新命令，乃是叫你們彼此相愛；我怎樣愛你們，你們也要怎樣相愛。」</div>
+        <div class="verse-ref">— 約翰福音 13:34</div>
+    </div>
+
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
