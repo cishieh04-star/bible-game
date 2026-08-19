@@ -15,6 +15,19 @@
             border: 2px solid #8b4513; z-index: 1000;
         }
 
+        /* 新增：經文顯示區塊樣式 */
+        .verse-box {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #e6c27e;
+            margin: 20px auto;
+            color: #5d4037;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .verse-content { font-size: 19px; font-weight: bold; margin-bottom: 8px; line-height: 1.6; }
+        .verse-reference { font-size: 15px; color: #8b4513; font-weight: bold; }
+
         h2 { color: #8b4513; margin: 8px 0; font-size: 22px; }
         
         .action-container { margin: 8px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
@@ -52,7 +65,7 @@
         #reset-btn { background: #ff5722; color: white; display: none; }
 
         #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 75vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 28px; margin-bottom: 20px; }
+        #home-screen h1 { color: #8b4513; font-size: 28px; margin-bottom: 10px; }
         .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .start-btn:hover { background-color: #219653; }
         
@@ -62,6 +75,7 @@
             .tetris-word { width: 42px; height: 42px; font-size: 19px; }
             .slot { width: 26px; height: 26px; font-size: 13px; }
             .punctuation { font-size: 14px; }
+            .verse-content { font-size: 17px; }
         }
     </style>
 </head>
@@ -71,7 +85,13 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p class="instruction" style="font-size: 18px; margin-bottom: 30px;">約翰福音 17:17</p>
+    
+    <!-- 顯示經文與出處 -->
+    <div class="verse-box">
+        <div class="verse-content">「求祢用真理使他們成聖，祢的道就是真理。」</div>
+        <div class="verse-reference">— 約翰福音 17:17</div>
+    </div>
+
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
@@ -96,6 +116,7 @@
 </div>
 
 <script>
+    // 程式邏輯保持不變
     const fullText = "求祢用真理使他們成聖，祢的道就是真理。(約翰福音17:17)";
     const puncRegex = /[\-，；。、（）：「」:()?？]/; 
     
