@@ -24,6 +24,19 @@
 
         h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
         
+        /* 經文區塊樣式 */
+        .verse-display {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e6c27e;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 400px;
+        }
+        .verse-text { font-size: 20px; font-weight: bold; color: #5d4037; margin-bottom: 10px; }
+        .verse-ref { font-size: 16px; color: #8b4513; font-weight: bold; }
+
         .action-container { margin: 10px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 6px 12px; background: #FF0000; color: white; border-radius: 5px; font-size: 13px; font-weight: bold; }
         .preview-btn { padding: 6px 12px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; }
@@ -58,7 +71,7 @@
         #reset-btn { background: #ff5722; color: white; display: none; }
 
         #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 20px; }
+        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 10px; }
         .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
         
         #game-screen { display: none; width: 100%; }
@@ -70,7 +83,11 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <p style="font-size: 18px; margin-bottom: 20px;">約翰壹書 4:19</p>
+    <!-- 經文區塊 -->
+    <div class="verse-display">
+        <div class="verse-text">「我們愛，因為神先愛我們。」</div>
+        <div class="verse-ref">— 約翰壹書 4:19</div>
+    </div>
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
@@ -95,7 +112,6 @@
 </div>
 
 <script>
-    // 經文內容中，確保出處與文字間沒有空格
     const fullText = "我們愛，因為神先愛我們。(約翰壹書4:19)";
     const puncRegex = /[\-，；。、（）：「」:()?？]/; 
     
@@ -152,7 +168,6 @@
             }
         });
 
-        // 掉落區僅取純文字與數字
         const options = fullText.split('').filter(c => !puncRegex.test(c));
         const blockSize = 6; 
         blocksData = [];
