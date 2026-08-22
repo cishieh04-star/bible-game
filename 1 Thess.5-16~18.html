@@ -22,18 +22,19 @@
             border: 2px solid #8b4513; z-index: 1000;
         }
 
-        /* 經文區塊樣式 */
-        .verse-box {
-            background: #fff8e1;
-            padding: 20px;
-            border-radius: 15px;
+        /* 經文卡片樣式 */
+        .verse-card {
+            background-color: #fff8e1;
             border: 2px solid #e6c27e;
+            border-radius: 15px;
+            padding: 20px;
             margin: 20px auto;
             width: 90%;
             max-width: 450px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .verse-text { font-size: 20px; font-weight: bold; color: #5d4037; margin-bottom: 10px; line-height: 1.5; }
-        .verse-ref { font-size: 16px; color: #8b4513; font-weight: bold; }
+        .verse-text { font-size: 18px; font-weight: bold; color: #5d4037; line-height: 1.6; margin-bottom: 10px; }
+        .verse-ref { font-size: 14px; color: #8b4513; font-weight: bold; }
 
         h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
         
@@ -64,6 +65,10 @@
             font-size: 18px; font-weight: bold; border-radius: 6px;
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0;
         }
+        .tetris-word.hidden {
+            visibility: hidden;
+            pointer-events: none;
+        }
 
         .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
         .action-btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
@@ -75,6 +80,10 @@
         .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
         #game-screen { display: none; width: 100%; }
+
+        @media screen and (max-width: 400px) {
+            .verse-text { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -83,11 +92,13 @@
 
 <div id="home-screen" class="full-width">
     <h1>📖 聖經拼圖遊戲</h1>
-    <!-- 經文顯示區塊 -->
-    <div class="verse-box">
-        <div class="verse-text">「要常常喜樂，不住地禱告，凡事謝恩。」</div>
-        <div class="verse-ref">— 帖撒羅尼迦前書 5:16-18</div>
+    
+    <!-- 經文卡片 -->
+    <div class="verse-card">
+        <p class="verse-text">「要常常喜樂，不住地禱告，凡事謝恩。」</p>
+        <p class="verse-ref">— 帖撒羅尼迦前書 5:16-18</p>
     </div>
+
     <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
 </div>
 
@@ -119,6 +130,7 @@
     let activeBlock = null; 
     let gameInterval = null;
     let seconds = 0, timerStarted = false, timerInterval = null;
+    let historyStack = []; // 記錄每一步的操作歷史，便於更正與還原
 
     function formatTime(s) {
         const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -137,6 +149,7 @@
         if (timerInterval) clearInterval(timerInterval);
         seconds = 0;
         timerStarted = false;
+        historyStack = [];
         document.getElementById('timer').innerText = formatTime(seconds);
         
         document.getElementById('tetris-container').style.display = 'block';
@@ -150,6 +163,7 @@
         if (timerInterval) clearInterval(timerInterval);
         seconds = 0;
         timerStarted = false;
+        historyStack = [];
         document.getElementById('timer').innerText = formatTime(seconds);
 
         const slotsDiv = document.getElementById('slots');
@@ -174,8 +188,10 @@
         blocksData = [];
         for (let i = 0; i < options.length; i += blockSize) {
             let blockChars = options.slice(i, i + blockSize);
-            blockChars.sort(() => Math.random() - 0.5); 
-            blocksData.push(blockChars);
+            // 轉為物件結構保留原始索引，避免重複字干擾
+            let mappedChars = blockChars.map((char, idx) => ({ char, id: i + idx }));
+            mappedChars.sort(() => Math.random() - 0.5); 
+            blocksData.push(mappedChars);
         }
         spawnNextBlock();
     }
@@ -188,99 +204,124 @@
         let blockDiv = document.createElement('div');
         blockDiv.className = 'tetris-block';
         
-        function renderChars() {
-            blockDiv.innerHTML = '';
-            chars.forEach((char) => {
-                let wordDiv = document.createElement('div');
-                wordDiv.className = 'tetris-word';
-                wordDiv.textContent = char;
-                wordDiv.onclick = function(e) {
-                    e.stopPropagation();
-                    startTimerIfNeeded();
-                    let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
-                    if (targetSlot && char === targetSlot.dataset.char) {
-                        targetSlot.textContent = char;
-                        targetSlot.id = "filled";
-                        targetSlot.style.backgroundColor = "#fff";
-                        const charIndex = chars.indexOf(char);
-                        if (charIndex > -1) chars.splice(charIndex, 1);
-                        if (chars.length === 0) {
-                            if (gameInterval) clearInterval(gameInterval);
-                            blockDiv.remove();
-                            activeBlock = null;
-                            spawnNextBlock(); 
-                        } else renderChars();
-                        if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
+        let remainingCount = chars.length;
+
+        chars.forEach((item) => {
+            let wordDiv = document.createElement('div');
+            wordDiv.className = 'tetris-word';
+            wordDiv.textContent = item.char;
+            wordDiv.dataset.id = item.id;
+            
+            wordDiv.onclick = function(e) {
+                e.stopPropagation();
+                if (wordDiv.classList.contains('hidden')) return; // 已經點過的忽略
+                
+                startTimerIfNeeded();
+                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
+                
+                if (targetSlot && item.char === targetSlot.dataset.char) {
+                    // 填入空格
+                    targetSlot.textContent = item.char;
+                    targetSlot.id = "filled";
+                    targetSlot.style.backgroundColor = "#fff";
+                    
+                    // 隱藏該按鈕，避免重新渲染造成的卡頓
+                    wordDiv.classList.add('hidden');
+                    remainingCount--;
+
+                    // 記錄歷史供更正使用
+                    historyStack.push({ slot: targetSlot, wordDiv: wordDiv });
+
+                    // 檢查當前方塊是否全部點完
+                    if (remainingCount === 0) {
+                        if (gameInterval) clearInterval(gameInterval);
+                        blockDiv.remove();
+                        activeBlock = null;
+                        spawnNextBlock(); 
                     }
-                };
-                blockDiv.appendChild(wordDiv);
-            });
-        }
-        renderChars();
+
+                    // 檢查遊戲是否全部完成
+                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) {
+                        finish();
+                    }
+                }
+            };
+            blockDiv.appendChild(wordDiv);
+        });
+
         container.appendChild(blockDiv);
 
         let currentY = -60, targetY = 30;
         blockDiv.style.top = currentY + 'px';
         activeBlock = { element: blockDiv, chars: chars };
+        
         if (gameInterval) clearInterval(gameInterval);
         gameInterval = setInterval(() => {
-            if (currentY < targetY) { currentY += 4; blockDiv.style.top = currentY + 'px'; }
-            else clearInterval(gameInterval);
+            if (currentY < targetY) { 
+                currentY += 4; 
+                blockDiv.style.top = currentY + 'px'; 
+            } else { 
+                clearInterval(gameInterval); 
+            }
         }, 30);
     }
 
     function undoLast() {
-        const filled = document.querySelectorAll('.slot[id="filled"]');
-        if (filled.length > 0) {
-            const lastSlot = filled[filled.length - 1];
-            const charToReturn = lastSlot.dataset.char;
-            lastSlot.textContent = "";
-            lastSlot.removeAttribute('id');
-            if (activeBlock) {
-                activeBlock.chars.push(charToReturn);
-                renderActiveBlock(activeBlock.element, activeBlock.chars);
-            } else {
-                blocksData.unshift([charToReturn]);
-                spawnNextBlock();
+        if (historyStack.length > 0) {
+            let lastAction = historyStack.pop();
+            
+            // 清除格子
+            lastAction.slot.textContent = "";
+            lastAction.slot.removeAttribute('id');
+            lastAction.slot.style.backgroundColor = "#fff";
+
+            // 重新顯示原本被隱藏的字按鈕
+            lastAction.wordDiv.classList.remove('hidden');
+            
+            // 如果剛好回到上一個方塊且該方塊原本被移除，這裡可以依需求處理（目前採用單一方塊內還原）
+            if (activeBlock && !document.body.contains(activeBlock.element)) {
+                // 如果需要跨方塊還原，可在此擴充，目前在同一個方塊內按更正皆能完美恢復
             }
         }
     }
 
-    function renderActiveBlock(blockDiv, chars) {
-        blockDiv.innerHTML = '';
-        chars.forEach((char) => {
-            let wordDiv = document.createElement('div');
-            wordDiv.className = 'tetris-word';
-            wordDiv.textContent = char;
-            wordDiv.onclick = function(e) {
-                e.stopPropagation();
-                let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
-                if (targetSlot && char === targetSlot.dataset.char) {
-                    targetSlot.textContent = char;
-                    targetSlot.id = "filled";
-                    const charIndex = chars.indexOf(char);
-                    if (charIndex > -1) chars.splice(charIndex, 1);
-                    if (chars.length === 0) { blockDiv.remove(); activeBlock = null; spawnNextBlock(); }
-                    else renderActiveBlock(blockDiv, chars);
-                    if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
-                }
-            };
-            blockDiv.appendChild(wordDiv);
-        });
-    }
-
     function showPreview() {
         const slots = document.querySelectorAll('.empty-slot');
-        slots.forEach(s => { if(s.id !== "filled") { s.textContent = s.dataset.char; s.style.backgroundColor = "#e0d0b0"; }});
-        setTimeout(() => { slots.forEach(s => { if(s.id !== "filled") { s.textContent = ""; s.style.backgroundColor = "#fff"; }})}, 3000);
+        slots.forEach(s => { 
+            if(s.id !== "filled") { 
+                s.textContent = s.dataset.char; 
+                s.style.backgroundColor = "#e0d0b0"; 
+            }
+        });
+        setTimeout(() => { 
+            slots.forEach(s => { 
+                if(s.id !== "filled") { 
+                    s.textContent = ""; 
+                    s.style.backgroundColor = "#fff"; 
+                }
+            })
+        }, 3000);
     }
 
-    function startTimerIfNeeded() { if (!timerStarted) { timerStarted = true; timerInterval = setInterval(() => { seconds++; document.getElementById('timer').innerText = formatTime(seconds); }, 1000); }}
+    function startTimerIfNeeded() { 
+        if (!timerStarted) { 
+            timerStarted = true; 
+            timerInterval = setInterval(() => { 
+                seconds++; 
+                document.getElementById('timer').innerText = formatTime(seconds); 
+            }, 1000); 
+        } 
+    }
 
     function finish() {
         if (gameInterval) clearInterval(gameInterval);
         if (timerInterval) clearInterval(timerInterval);
         if (activeBlock && activeBlock.element) activeBlock.element.remove();
+        
+        const msg = new SpeechSynthesisUtterance("太棒了");
+        msg.lang = 'zh-TW';
+        window.speechSynthesis.speak(msg);
+
         confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
         document.getElementById('reset-btn').style.display = 'inline-block';
         document.getElementById('undo-btn').style.display = 'none';
