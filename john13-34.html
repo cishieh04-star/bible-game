@@ -6,73 +6,104 @@
     <title>聖經拼圖 - 約翰福音 13:34</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { 
             font-family: 'Microsoft JhengHei', sans-serif; 
             display: flex; flex-direction: column; align-items: center; 
-            padding: 10px; background-color: #fdf6e3; margin: 0; 
-            min-height: 100vh; position: relative; overflow-x: hidden; 
-            touch-action: manipulation;
+            padding: 5px 10px; background-color: #fdf6e3; margin: 0; 
+            min-height: 100vh; overflow-x: hidden; 
         }
         .full-width { width: 100%; max-width: 600px; text-align: center; }
         
         #timer { 
-            position: fixed; top: 15px; right: 15px; font-size: 16px; font-weight: bold; 
-            color: #8b4513; background: white; padding: 5px 10px; border-radius: 10px; 
-            border: 2px solid #8b4513; z-index: 1000;
+            position: fixed; top: 12px; right: 12px; font-size: 16px; font-weight: bold; 
+            color: #8b4513; background: white; padding: 4px 8px; border-radius: 8px; 
+            border: 2px solid #8b4513; z-index: 1000; 
         }
 
-        /* 經文區塊樣式 - 確保RWD */
-        .verse-box {
-            background: #fff8e1;
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid #e6c27e;
-            margin: 20px auto;
-            width: 90%;
-            max-width: 450px;
-        }
-        .verse-text { font-size: 19px; font-weight: bold; color: #5d4037; margin-bottom: 10px; line-height: 1.5; }
-        .verse-ref { font-size: 15px; color: #8b4513; font-weight: bold; }
-
-        h2 { color: #8b4513; margin: 10px 0; font-size: 20px; }
+        h2 { color: #8b4513; margin: 6px 0; font-size: 20px; }
         
-        .action-container { margin: 10px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .yt-link { text-decoration: none; padding: 6px 12px; background: #FF0000; color: white; border-radius: 5px; font-size: 13px; font-weight: bold; }
-        .preview-btn { padding: 6px 12px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .action-container { margin: 6px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .yt-link { text-decoration: none; padding: 5px 10px; background: #FF0000; color: white; border-radius: 5px; font-size: 13px; font-weight: bold; }
+        .preview-btn { padding: 5px 10px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; }
         
-        .grid-container { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin: 15px 0; align-items: center; }
+        .grid-container { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin: 6px 0; align-items: center; }
         .slot { width: 28px; height: 28px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 5px; font-weight: bold; font-size: 14px; color: #333; }
+        .punctuation { font-size: 16px; font-weight: bold; color: #5d6d7e; margin: 0 1px; display: flex; align-items: center; }
+        .instruction { color: #5d6d7e; margin-bottom: 6px; font-weight: bold; font-size: 13px; }
         
-        .punctuation { font-size: 16px; font-weight: bold; color: #5d6d7e; margin: 0 1px; }
-        .instruction { color: #5d6d7e; margin-bottom: 10px; font-weight: bold; font-size: 14px; }
-        
-        #tetris-container {
-            width: 100%; max-width: 500px; height: 120px; background-color: #ffffff;
-            border-radius: 8px; position: relative; overflow: hidden; margin-top: 10px;
-            border: 2px solid #8b4513; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        #tetris-container { 
+            width: 100%; max-width: 100%; height: 100px; background-color: #ffffff; 
+            border-radius: 8px; position: relative; overflow: hidden; margin-top: 5px; 
+            border: 2px solid #8b4513; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        .tetris-block { position: absolute; display: flex; gap: 4px; justify-content: center; left: 50%; transform: translateX(-50%); width: 95%; flex-wrap: wrap; }
+        .tetris-word { 
+            width: 40px; height: 40px; background-color: #8b4513; color: #ffffff; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; 
+            font-size: 18px; font-weight: bold; border-radius: 6px; 
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0; 
         }
 
-        .tetris-block {
-            position: absolute; display: flex; gap: 4px; justify-content: center; left: 50%;
-            transform: translateX(-50%); transition: top 0.05s linear; width: 95%;
-        }
-
-        .tetris-word {
-            width: 40px; height: 40px; background-color: #8b4513; color: #ffffff;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            font-size: 18px; font-weight: bold; border-radius: 6px;
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.2); user-select: none; flex-shrink: 0;
-        }
-
-        .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .action-btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; }
+        .btn-group { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+        .action-btn { padding: 7px 16px; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; font-weight: bold; }
         #undo-btn { background: #f39c12; color: white; }
         #reset-btn { background: #ff5722; color: white; display: none; }
 
-        #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        #home-screen h1 { color: #8b4513; font-size: 26px; margin-bottom: 10px; }
-        .start-btn { padding: 15px 30px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        /* 雙頁切換架構：緊湊靠上對齊，消除上方過多留白 */
+        .page-container { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px 0; min-height: 85vh; text-align: center; width: 100%; }
+        .page-container h1 { color: #8b4513; font-size: 22px; margin: 2px 0; }
+        
+        /* 統一的聖經全文與參考說明卡片樣式：自適應高度，絕不切掉文字 */
+        .content-card { 
+            background: #fff8e1; 
+            padding: 15px 18px; 
+            border-radius: 12px; 
+            border: 2px solid #e6c27e; 
+            margin: 6px auto; 
+            font-family: "KaiTi", "BiauKai", "STKaiti", "Microsoft JhengHei", serif; 
+            font-size: 18px; 
+            line-height: 1.8; 
+            color: #5d4037; 
+            font-weight: bold; 
+            width: 92%; 
+            max-width: 450px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            text-align: left;
+            height: auto; 
+            max-height: 350px;
+            overflow-y: auto;
+            white-space: pre-line;
+        }
+
+        /* 底部按鈕左右並排群組 */
+        .home-btn-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 92%;
+            max-width: 450px;
+            margin-top: 8px;
+        }
+
+        .home-btn-row button {
+            flex: 1;
+            padding: 10px 4px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        .translate-btn { background-color: #e67e22; }
+        .translate-btn:hover { background-color: #d35400; }
+        
+        .start-btn { background-color: #27ae60; }
+        .start-btn:hover { background-color: #219653; }
         
         #game-screen { display: none; width: 100%; }
     </style>
@@ -81,18 +112,44 @@
 
 <div id="timer">時間：00:00</div>
 
-<div id="home-screen" class="full-width">
+<!-- 【第一頁：聖經全文首頁】 -->
+<div id="home-page-1" class="full-width page-container">
     <h1>📖 聖經拼圖遊戲</h1>
+    <p style="color: #8b4513; font-weight: bold; font-size: 15px; margin: 2px 0 4px 0;">約翰福音 13:34</p>
     
-    <!-- 經文顯示區塊 -->
-    <div class="verse-box">
-        <div class="verse-text">「我賜給你們一條新命令，乃是叫你們彼此相愛；我怎樣愛你們，你們也要怎樣相愛。」</div>
-        <div class="verse-ref">— 約翰福音 13:34</div>
+    <div class="content-card">
+「我賜給你們一條新命令，
+乃是叫你們彼此相愛；
+我怎樣愛你們，
+你們也要怎樣相愛。」
     </div>
 
-    <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
+    <div class="home-btn-row">
+        <button class="translate-btn" onclick="showPage(2)">觀看參考說明</button>
+        <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
+    </div>
 </div>
 
+<!-- 【第二頁：參考說明頁】 -->
+<div id="home-page-2" class="full-width page-container" style="display: none;">
+    <h1>📖 聖經拼圖遊戲</h1>
+    <p style="color: #8b4513; font-weight: bold; font-size: 15px; margin: 2px 0 4px 0;">約翰福音 13:34 (參考說明)</p>
+    
+    <div class="content-card" style="font-family: 'Microsoft JhengHei', sans-serif; font-size: 13px; line-height: 1.6;">
+        <strong>【參考說明】</strong><br><br>
+        <strong>1. 「新」在標準與動機：</strong><br>
+        舊約早已要求「愛人如己」，但耶穌提出的新之處在於「照著我愛你們的方式」。這把愛的標準從「愛人如己（以自己為尺度）」提升到「以基督捨己的十字架之愛為尺度」。<br><br>
+        <strong>2. 群體的獨特記號：</strong><br>
+        這條命令是給予門徒群體的。大衛·鮑森強調，彼此相愛不只是道德倫理，更是基督徒群體對外最強烈、最具說服力的識別證——世人不是透過口號，而是透過信徒之間這種超越世俗的愛，認出這是屬主的群體。
+    </div>
+
+    <div class="home-btn-row">
+        <button class="translate-btn" onclick="showPage(1)">觀看聖經全文</button>
+        <button class="start-btn" onclick="startGame()">開始聖經拼圖遊戲</button>
+    </div>
+</div>
+
+<!-- 【遊戲主畫面】 -->
 <div id="game-screen" class="full-width">
     <h2>約翰福音 13:34</h2>
     
@@ -110,17 +167,28 @@
     <div class="btn-group">
         <button id="undo-btn" class="action-btn" onclick="undoLast()">⟲ 更正</button>
         <button id="reset-btn" class="action-btn" onclick="resetGame()">再玩一次</button>
+        <button class="action-btn" style="background: #7f8c8d; color: white;" onclick="goHome()">🏠 回首頁</button>
     </div>
 </div>
 
 <script>
     const fullText = "我賜給你們一條新命令，乃是叫你們彼此相愛；我怎樣愛你們，你們也要怎樣相愛。(約翰福音 13:34)";
-    const puncRegex = /[\-，；。、（）：「」:()?？ ]/; 
+    const puncRegex = /[\-.,，；。、（）：「」:()?？「」 ]/; 
     
     let blocksData = []; 
     let activeBlock = null; 
     let gameInterval = null;
     let seconds = 0, timerStarted = false, timerInterval = null;
+
+    function showPage(pageNum) {
+        if (pageNum === 1) {
+            document.getElementById('home-page-1').style.display = 'flex';
+            document.getElementById('home-page-2').style.display = 'none';
+        } else {
+            document.getElementById('home-page-1').style.display = 'none';
+            document.getElementById('home-page-2').style.display = 'flex';
+        }
+    }
 
     function formatTime(s) {
         const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -129,9 +197,17 @@
     }
 
     function startGame() {
-        document.getElementById('home-screen').style.display = 'none';
+        document.getElementById('home-page-1').style.display = 'none';
+        document.getElementById('home-page-2').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
         initGame();
+    }
+
+    function goHome() {
+        if (gameInterval) clearInterval(gameInterval);
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById('game-screen').style.display = 'none';
+        showPage(1);
     }
 
     function resetGame() {
@@ -189,35 +265,7 @@
         let blockDiv = document.createElement('div');
         blockDiv.className = 'tetris-block';
         
-        function renderChars() {
-            blockDiv.innerHTML = '';
-            chars.forEach((char) => {
-                let wordDiv = document.createElement('div');
-                wordDiv.className = 'tetris-word';
-                wordDiv.textContent = char;
-                wordDiv.onclick = function(e) {
-                    e.stopPropagation();
-                    startTimerIfNeeded();
-                    let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
-                    if (targetSlot && char === targetSlot.dataset.char) {
-                        targetSlot.textContent = char;
-                        targetSlot.id = "filled";
-                        targetSlot.style.backgroundColor = "#fff";
-                        const charIndex = chars.indexOf(char);
-                        if (charIndex > -1) chars.splice(charIndex, 1);
-                        if (chars.length === 0) {
-                            if (gameInterval) clearInterval(gameInterval);
-                            blockDiv.remove();
-                            activeBlock = null;
-                            spawnNextBlock(); 
-                        } else renderChars();
-                        if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
-                    }
-                };
-                blockDiv.appendChild(wordDiv);
-            });
-        }
-        renderChars();
+        renderActiveBlock(blockDiv, chars);
         container.appendChild(blockDiv);
 
         let currentY = -60, targetY = 30;
@@ -237,6 +285,7 @@
             const charToReturn = lastSlot.dataset.char;
             lastSlot.textContent = "";
             lastSlot.removeAttribute('id');
+            lastSlot.style.backgroundColor = "#fff";
             if (activeBlock) {
                 activeBlock.chars.push(charToReturn);
                 renderActiveBlock(activeBlock.element, activeBlock.chars);
@@ -255,14 +304,22 @@
             wordDiv.textContent = char;
             wordDiv.onclick = function(e) {
                 e.stopPropagation();
+                startTimerIfNeeded();
                 let targetSlot = document.querySelector('.empty-slot:not([id="filled"])');
                 if (targetSlot && char === targetSlot.dataset.char) {
                     targetSlot.textContent = char;
                     targetSlot.id = "filled";
+                    targetSlot.style.backgroundColor = "#fff";
                     const charIndex = chars.indexOf(char);
                     if (charIndex > -1) chars.splice(charIndex, 1);
-                    if (chars.length === 0) { blockDiv.remove(); activeBlock = null; spawnNextBlock(); }
-                    else renderActiveBlock(blockDiv, chars);
+                    if (chars.length === 0) { 
+                        if (gameInterval) clearInterval(gameInterval); 
+                        blockDiv.remove(); 
+                        activeBlock = null; 
+                        spawnNextBlock(); 
+                    } else {
+                        renderActiveBlock(blockDiv, chars);
+                    }
                     if (document.querySelectorAll('.empty-slot:not([id="filled"])').length === 0) finish();
                 }
             };
@@ -276,7 +333,15 @@
         setTimeout(() => { slots.forEach(s => { if(s.id !== "filled") { s.textContent = ""; s.style.backgroundColor = "#fff"; }})}, 3000);
     }
 
-    function startTimerIfNeeded() { if (!timerStarted) { timerStarted = true; timerInterval = setInterval(() => { seconds++; document.getElementById('timer').innerText = formatTime(seconds); }, 1000); }}
+    function startTimerIfNeeded() { 
+        if (!timerStarted) { 
+            timerStarted = true; 
+            timerInterval = setInterval(() => { 
+                seconds++; 
+                document.getElementById('timer').innerText = formatTime(seconds); 
+            }, 1000); 
+        } 
+    }
 
     function finish() {
         if (gameInterval) clearInterval(gameInterval);
