@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>聖經常識問答 - 七印奧祕</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; background-color: #fdf6e3; margin: 0; min-height: 100vh; position: relative; overflow-x: hidden; box-sizing: border-box; }
+        .full-width { width: 100%; max-width: 600px; text-align: center; margin-top: 5px; }
+
+        h2 { color: #8b4513; margin: 8px 0; font-size: 20px; }
+        
+        .instruction { color: #5d6d7e; margin-bottom: 12px; font-weight: bold; font-size: 15px; }
+        
+        .question-box {
+            background: #fff; border: 2px solid #8b4513; border-radius: 8px; padding: 15px; margin: 10px 0; font-size: 17px; color: #333; line-height: 1.5; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: left;
+        }
+
+        /* 選項容器樣式 */
+        #options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .option-btn {
+            background-color: #fff;
+            border: 2px solid #8b4513;
+            color: #8b4513;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            background-color: #faebd7;
+        }
+
+        .option-btn.correct {
+            background-color: #27ae60 !important;
+            color: white !important;
+            border-color: #27ae60 !important;
+        }
+
+        .option-btn.wrong {
+            background-color: #c0392b !important;
+            color: white !important;
+            border-color: #c0392b !important;
+        }
+
+        .btn-group { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+        .action-btn { padding: 8px 14px; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; font-weight: bold; }
+
+        #home-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 85vh; text-align: center; padding: 10px 0; }
+        #home-screen h1 { color: #8b4513; font-size: 24px; margin-bottom: 5px; }
+        
+        .desc-box { 
+            background: #fff; border: 2px solid #8b4513; border-radius: 8px; padding: 12px; 
+            margin: 8px 0; max-width: 480px; width: 90%; font-size: 13px; color: #333; 
+            line-height: 1.5; text-align: left; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            max-height: 300px; overflow-y: auto; 
+        }
+        
+        .stage-select { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 10px; }
+        .start-btn { padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        
+        #game-screen { display: none; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="home-screen" class="full-width">
+    <h1>📖 啟示錄七印 - 選擇題問答</h1>
+    <p class="instruction">挑戰聖經難題，開心闖關！</p>
+    
+    <div class="desc-box">
+        <p style="margin-top: 0; font-weight: bold; color: #8b4513; font-size: 14px;">📝 題目內容預覽：</p>
+        <ul style="padding-left: 18px; margin: 4px 0; color: #444;">
+            <li><b>第 1 題：</b>七印由誰揭開？ <b>( 羔羊 )</b></li>
+            <li><b>第 2 題：</b>約翰為何大哭？ <b>( 為神計劃不能完成 )</b></li>
+            <li><b>第 3 題：</b>白馬象徵什麼？ <b>( 權力野心與軍事征服 )</b></li>
+            <li><b>第 4 題：</b>紅馬象徵什麼？ <b>( 戰爭與彼此相殺 )</b></li>
+            <li><b>第 5 題：</b>黑馬象徵什麼？ <b>( 飢荒與社會不公 )</b></li>
+            <li><b>第 6 題：</b>第四印灰馬象徵？ <b>( 死亡與大規模傷亡 )</b></li>
+            <li><b>第 7 題：</b>灰馬殺害多少人口？ <b>( 四分之一 )</b></li>
+            <li><b>第 8 題：</b>第五印祭壇底下靈魂喊著說，要等到幾時才怎樣？ <b>( 給我們伸流血的冤 )</b></li>
+            <li><b>第 9 題：</b>第六印地大震動時，滿月變成了什麼顏色？ <b>( 像血 )</b></li>
+            <li><b>第 10 題：</b>第六印中，天挪移時像什麼被捲起來？ <b>( 書卷 )</b></li>
+            <li><b>第 11 題：</b>第六印中，地上的君王與眾人躲在山洞時，向山和巖石說什麼？ <b>( 倒在我們身上吧 )</b></li>
+        </ul>
+    </div>
+
+    <div class="stage-select">
+        <button class="start-btn" onclick="startStage(1)">開始挑戰 🚀</button>
+    </div>
+</div>
+
+<div id="game-screen" class="full-width">
+    <h2 id="stage-title">第 1 題 / 共 11 題</h2>
+    <div id="question-text" class="question-box">題目載入中...</div>
+    <div class="instruction">請選擇正確的答案：</div>
+    
+    <!-- 選項按鈕放置區 -->
+    <div id="options-container"></div>
+
+    <div class="btn-group">
+        <button class="action-btn" style="background: #34495e; color: white;" onclick="goHome()">📖 回說明頁</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { 
+            title: "第 1 題 / 共 11 題", 
+            question: "題目 1：七印由誰揭開？", 
+            answer: "羔羊", 
+            options: ["天使", "羔羊", "約翰", "長老"] 
+        },
+        { 
+            title: "第 2 題 / 共 11 題", 
+            question: "題目 2：約翰為何大哭？", 
+            answer: "為神計劃不能完成", 
+            options: ["因為受到迫害與逼迫", "為神計劃不能完成", "因為看見災難太可怕", "找不到書卷的封套"] 
+        },
+        { 
+            title: "第 3 題 / 共 11 題", 
+            question: "題目 3：白馬象徵什麼？", 
+            answer: "權力野心與軍事征服", 
+            options: ["權力野心與軍事征服", "戰爭與彼此相殺", "飢荒與社會不公", "死亡與大規模傷亡"] 
+        },
+        { 
+            title: "第 4 題 / 共 11 題", 
+            question: "題目 4：紅馬象徵什麼？", 
+            answer: "戰爭與彼此相殺", 
+            options: ["權力野心與軍事征服", "戰爭與彼此相殺", "飢荒與社會不公", "死亡與大規模傷亡"] 
+        },
+        { 
+            title: "第 5 題 / 共 11 題", 
+            question: "題目 5：黑馬象徵什麼？", 
+            answer: "飢荒與社會不公", 
+            options: ["權力野心與軍事征服", "戰爭與彼此相殺", "飢荒與社會不公", "死亡與大規模傷亡"] 
+        },
+        { 
+            title: "第 6 題 / 共 11 題", 
+            question: "題目 6：第四印灰馬象徵？", 
+            answer: "死亡與大規模傷亡", 
+            options: ["權力野心與軍事征服", "戰爭與彼此相殺", "飢荒與社會不公", "死亡與大規模傷亡"] 
+        },
+        { 
+            title: "第 7 題 / 共 11 題", 
+            question: "題目 7：灰馬殺害多少人口？", 
+            answer: "四分之一", 
+            options: ["三分之一", "四分之一", "二分之一", "十分之一"] 
+        },
+        { 
+            title: "第 8 題 / 共 11 題", 
+            question: "題目 8：第五印中，祭壇底下的靈魂大聲喊著說，不審判住在地上的人、不怎樣要等到幾時呢？", 
+            answer: "給我們伸流血的冤", 
+            options: ["給我們伸流血的冤", "為我們賜下白衣與冠冕", "將審判的權柄交給眾人", "使地上的君王全數滅亡"] 
+        },
+        { 
+            title: "第 9 題 / 共 11 題", 
+            question: "題目 9：第六印揭開、地大震動時，滿月變成了什麼顏色？", 
+            answer: "像血", 
+            options: ["像血", "像墨黑", "像火炭", "像雪白"] 
+        },
+        { 
+            title: "第 10 題 / 共 11 題", 
+            question: "題目 10：第六印中，天挪移時好像什麼被捲起來？", 
+            answer: "書卷", 
+            options: ["書卷", "帳幕", "布幔", "地毯"] 
+        },
+        { 
+            title: "第 11 題 / 共 11 題", 
+            question: "題目 11：第六印中，地上的君王與眾人藏在洞穴裡，向山和巖石說什麼？", 
+            answer: "倒在我們身上吧", 
+            options: ["倒在我們身上吧", "求你們保護我們", "把審判挪開我們吧", "將羔羊的忿怒止息吧"] 
+        }
+    ];
+
+    let currentStage = 1;
+    let isAnswered = false;
+
+    function startStage(stageNum) {
+        currentStage = stageNum;
+        isAnswered = false;
+        let qData = questions[stageNum - 1];
+        
+        document.getElementById('stage-title').innerText = qData.title;
+        document.getElementById('question-text').innerText = qData.question;
+        document.getElementById('home-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        
+        initGame();
+    }
+
+    function goHome() {
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('home-screen').style.display = 'flex';
+    }
+
+    function initGame() {
+        const qData = questions[currentStage - 1];
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        let shuffledOptions = [...qData.options];
+        shuffledOptions.sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach((optionText) => {
+            let btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = optionText;
+            
+            btn.onclick = function() {
+                if (isAnswered) return;
+
+                if (optionText === qData.answer) {
+                    isAnswered = true;
+                    btn.classList.add('correct');
+                    finish();
+                } else {
+                    btn.classList.add('wrong');
+                    btn.disabled = true;
+                }
+            };
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function finish() {
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        
+        setTimeout(() => {
+            if (currentStage < questions.length) {
+                startStage(currentStage + 1);
+            } else {
+                alert("恭喜通關所有題目！");
+                goHome();
+            }
+        }, 1500);
+    }
+</script>
+</body>
+</html>
