@@ -124,11 +124,11 @@
 
   .slots-row{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; align-items:center; }
   .slot{ width:calc(var(--char-size) + 16px); height:calc(var(--char-size) + 16px);
-    border:2px dashed rgba(120,90,40,0.5); border-radius:8px; display:flex; align-items:center;
+    border:2.5px dashed rgba(92,58,46,0.85); border-radius:8px; display:flex; align-items:center;
     justify-content:center; font-size:var(--char-size); font-weight:bold; color:var(--ink);
-    font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.32); }
-  .slot.filled{ border-style:solid; border-color:#a03a2e; color:#a03a2e;
-    text-shadow:0 0 6px rgba(160,58,46,0.4); background:rgba(160,58,46,0.13); }
+    font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.82); }
+  .slot.filled{ border-style:solid; border-width:2.5px; border-color:#a03a2e; color:var(--ink);
+    text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(160,58,46,0.35) inset; }
   .slot.hint-target{ animation:hintPulse 1.2s ease-in-out infinite; }
   @keyframes hintPulse{ 0%,100%{ box-shadow:0 0 0 rgba(160,58,46,0.6);} 50%{ box-shadow:0 0 14px rgba(160,58,46,0.9);} }
   .punct{ font-size:calc(var(--char-size) - 4px); color:var(--ink-soft); margin:0 1px; align-self:flex-end; }
