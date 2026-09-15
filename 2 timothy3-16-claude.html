@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>聖經默示</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+
+  :root{
+    --sky-top:#fffdf2;
+    --sky-mid:#fff0b8;
+    --sky-bottom:#f0c860;
+    --gold:#e0a820;
+    --ink:#5c4408;
+    --ink-soft:rgba(92,68,8,0.78);
+    --accent:#8c6c18;
+    --seal-gold:#d9a020;
+    --glass-bg:rgba(255,253,240,0.34);
+    --char-size:24px;
+    --caption-size:16px;
+  }
+  :root.font-l{ --char-size:28px; --caption-size:18px; }
+  :root.font-xl{ --char-size:32px; --caption-size:20px; }
+
+  *{ box-sizing:border-box; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+  body{
+    margin:0; min-height:100vh; overflow-x:hidden;
+    font-family:'Microsoft JhengHei','PingFang TC',sans-serif;
+    background:linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-bottom) 100%);
+    color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:10px 12px 30px;
+    transition:background 1.2s ease;
+  }
+  body.dawn{
+    background:linear-gradient(to bottom, #fffef6 0%, #fff2c4 45%, #f5d484 100%);
+  }
+  body.dawn .sil-back{ opacity:.5; }
+  body.dawn .sil-front{ opacity:.65; }
+
+  .scene-bg{ position:fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
+  .scene-bg::before{ content:''; position:absolute; top:-15%; left:50%; width:80%; padding-top:80%;
+    transform:translateX(-50%); border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.55), transparent 68%); }
+  .ambient-wrap{ position:absolute; inset:0; }
+  .ambient-drop{
+    position:absolute; bottom:-5%; width:4px; height:4px; border-radius:50%;
+    background:radial-gradient(circle, #ffffff, #ffedb0 70%);
+    box-shadow:0 0 5px rgba(255,235,170,0.9);
+    animation-name:motesRise; animation-timing-function:ease-in-out; animation-iteration-count:infinite;
+  }
+  @keyframes motesRise{
+    0%{ bottom:-5%; opacity:0; transform:translateX(0); }
+    15%{ opacity:.95; }
+    85%{ opacity:.55; }
+    100%{ bottom:100%; opacity:0; transform:translateX(var(--drift,20px)); }
+  }
+  .sil{ position:absolute; bottom:0; left:0; width:100%; transition:background 1.2s ease, opacity 1.2s ease; }
+  .sil-back{ height:104px; background:#c4a850; opacity:.5;
+    clip-path:polygon(0 100%,0 76%,10% 64%,22% 74%,34% 58%,48% 72%,60% 56%,74% 72%,86% 60%,100% 70%,100% 100%); }
+  .sil-front{ height:58px; background:#8c7420;
+    clip-path:polygon(0 100%,0 84%,14% 70%,28% 86%,42% 68%,58% 86%,72% 68%,86% 86%,96% 72%,100% 82%,100% 100%); }
+
+  .page{ position:relative; z-index:2; width:100%; max-width:480px; }
+
+  #timer{ position:fixed; top:10px; left:12px; font-size:13px; color:var(--ink);
+    background:rgba(255,255,255,0.5); padding:4px 10px; border-radius:10px; border:1px solid rgba(92,68,8,0.3); z-index:1000; }
+  .font-controls{ position:fixed; top:10px; right:12px; z-index:1000; display:flex; gap:6px; }
+  .font-controls button{ width:30px; height:30px; border-radius:8px; border:1px solid rgba(92,68,8,0.35);
+    background:rgba(255,255,255,0.5); color:var(--ink); font-size:13px; font-weight:bold; cursor:pointer; }
+
+  #home{ text-align:center; padding-top:7vh; min-height:88vh; display:flex; flex-direction:column; align-items:center; }
+  .eyebrow{ font-size:13px; letter-spacing:2px; color:var(--ink-soft); margin:0 0 6px; }
+  .poem-title{ font-size:25px; margin:0; letter-spacing:3px; color:#8c6c10;
+    font-family:"KaiTi","STKaiti","BiauKai",serif; text-shadow:0 0 18px rgba(224,168,32,0.45); }
+  .poet-line{ margin:6px 0 22px; font-size:14px; color:var(--ink-soft); }
+  .preview-line{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:22px; letter-spacing:4px;
+    color:var(--ink); min-height:34px; margin-bottom:26px; }
+  .preview-line span{ opacity:0; display:inline-block; animation:charFadeIn .6s forwards; }
+  @keyframes charFadeIn{ to{ opacity:1; } }
+
+  .candle-btn{ font-size:17px; font-weight:bold; padding:14px 28px; border:none; border-radius:30px;
+    background:linear-gradient(180deg,#fff0b8,#d9a020); color:#3a2c04; cursor:pointer;
+    box-shadow:0 0 22px rgba(224,168,32,0.5); margin-bottom:14px; }
+  .ghost-btn{ background:none; border:1px solid rgba(92,68,8,0.4); color:var(--ink);
+    padding:9px 18px; border-radius:20px; font-size:13px; cursor:pointer; }
+  .full-panel{ margin-top:16px; width:92%; max-width:420px; background:rgba(255,255,255,0.42);
+    border:1px solid rgba(92,68,8,0.3); border-radius:12px; padding:14px 16px; text-align:left; }
+  .full-text{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:17px; line-height:1.9; color:var(--ink); }
+  .full-trans{ margin-top:10px; font-size:13px; line-height:1.7; color:var(--ink-soft); }
+
+  #game{ display:flex; flex-direction:column; align-items:center; padding-top:2vh; }
+  .progress-dots{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; max-width:280px; }
+  .progress-dots span{ width:9px; height:9px; border-radius:50%; background:rgba(92,68,8,0.2);
+    border:1px solid rgba(92,68,8,0.4); transition:background .4s; }
+  .progress-dots span.done{ background:#d9a020; box-shadow:0 0 8px rgba(217,160,32,0.7); }
+
+  .window-scene{ position:relative; display:flex; align-items:flex-end; justify-content:center; gap:6px; width:100%; }
+  .window-scene::before{ content:''; position:absolute; top:10%; left:50%; width:240px; height:240px;
+    transform:translate(-50%,-30%); border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, rgba(224,168,32,0.35), transparent 70%); z-index:-1; }
+  
+  .light-holder{ position:relative; width:42px; height:56px; margin-bottom:14px; flex-shrink:0;
+    filter:drop-shadow(0 0 var(--glow,10px) #fff0b8); transition:filter .6s; display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-end; }
+  .light-holder .book{ position:relative; width:30px; height:20px; background:#5c4408; border-radius:2px; }
+  .light-holder .book::after{ content:''; position:absolute; top:0; left:50%; width:1px; height:100%;
+    background:rgba(255,255,255,0.5); }
+  .light-holder .orb{ width:20px; height:20px; border-radius:50%; margin-bottom:10px;
+    background:radial-gradient(circle at 35% 30%, #fffef0, #fff0b8 55%, #e0a820 90%);
+    animation:glow 1.9s ease-in-out infinite; }
+  @keyframes glow{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.22); } }
+
+
+  .window-frame{ background:linear-gradient(160deg,#fff0c4,#d4b468); border:3px solid #e8cc84;
+    border-radius:10px; padding:8px; width:100%; max-width:390px; box-shadow:0 6px 18px rgba(92,68,8,0.28); }
+  .glass{ position:relative; background:var(--glass-bg); border-radius:6px; padding:14px 8px;
+    min-height:70px; display:flex; align-items:center; justify-content:center; overflow:hidden;
+    box-shadow:inset 0 0 24px rgba(92,68,8,0.18); }
+  .glass.ripple::after{ content:''; position:absolute; inset:0; border-radius:6px;
+    background:radial-gradient(circle, rgba(224,168,32,0.4), transparent 65%);
+    animation:rippleAnim .55s ease-out; }
+  @keyframes rippleAnim{ 0%{ opacity:0; transform:scale(.6);} 40%{ opacity:1;} 100%{ opacity:0; transform:scale(1.3);} }
+
+  .slots-row{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; align-items:center; }
+  .slot{ width:calc(var(--char-size) + 16px); height:calc(var(--char-size) + 16px);
+    border:2.5px dashed rgba(92,68,8,0.85); border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-size:var(--char-size); font-weight:bold; color:var(--ink);
+    font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.82); }
+  .slot.filled{ border-style:solid; border-width:2.5px; border-color:#d9a020; color:var(--ink);
+    text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(217,160,32,0.35) inset; }
+  .slot.hint-target{ animation:hintPulse 1.2s ease-in-out infinite; }
+  @keyframes hintPulse{ 0%,100%{ box-shadow:0 0 0 rgba(217,160,32,0.6);} 50%{ box-shadow:0 0 14px rgba(217,160,32,0.9);} }
+  .punct{ font-size:calc(var(--char-size) - 4px); color:var(--ink-soft); margin:0 1px; align-self:flex-end; }
+
+  .drop-zone{ width:100%; max-width:390px; height:120px; position:relative; margin-top:6px;
+    border-radius:10px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.18), transparent);
+    transition:height .3s ease; }
+  .char-cluster{ position:absolute; left:50%; top:-70px; transform:translateX(-50%); display:flex; gap:8px;
+    flex-wrap:wrap; justify-content:center; width:94%; transition:top .05s linear; }
+  .char-drop{ width:calc(var(--char-size) + 26px); height:calc(var(--char-size) + 26px); border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #5c4408, #2e2204 78%); color:#fff8e6;
+    display:flex; align-items:center; justify-content:center; font-size:var(--char-size); font-weight:bold;
+    cursor:pointer; user-select:none; box-shadow:0 4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(224,168,32,0.4);
+    font-family:"KaiTi","STKaiti","BiauKai",serif; flex-shrink:0; text-shadow:0 1px 2px rgba(0,0,0,0.4);
+    border:1.5px solid rgba(255,238,180,0.4);
+    animation:bob 2.4s ease-in-out infinite; transition:transform .18s ease; }
+  .char-drop:active{ transform:scale(0.9); }
+  @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(-2deg); } 50%{ transform:translateY(-5px) rotate(2deg); } }
+  .char-drop.hint-glow{ animation:hintPulse 0.5s ease-in-out 2; box-shadow:0 0 18px var(--gold); }
+  .char-drop.wrong-shake{ animation:shake .35s; }
+  @keyframes shake{ 20%,60%{ transform:translateX(-4px);} 40%,80%{ transform:translateX(4px);} }
+  .char-drop.pop{ animation:popAway .28s ease forwards !important; }
+  @keyframes popAway{ 0%{ transform:scale(1); opacity:1; } 60%{ transform:scale(1.35); opacity:1; } 100%{ transform:scale(0.2); opacity:0; } }
+
+  .controls-row{ display:flex; gap:8px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
+  .ctrl-btn{ padding:9px 14px; border:1px solid rgba(92,68,8,0.4); border-radius:20px;
+    background:rgba(255,255,255,0.4); color:var(--ink); font-size:13px; font-weight:bold; cursor:pointer; }
+  .ctrl-btn.home-btn{ background:rgba(255,255,255,0.55); }
+
+  #finish{ text-align:center; padding-top:6vh; display:flex; flex-direction:column; align-items:center; }
+  .seal{ width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff6d0, var(--seal-gold) 75%);
+    color:#3a2c04; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold;
+    font-family:"KaiTi","STKaiti","BiauKai",serif; letter-spacing:1px;
+    box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 4px 14px rgba(217,160,32,0.4); transform:scale(0);
+    animation:stampIn .5s cubic-bezier(.34,1.56,.64,1) forwards; margin-bottom:10px; }
+  @keyframes stampIn{ to{ transform:scale(1); } }
+  #finish h2{ margin:2px 0 12px; font-size:18px; color:#8c6c10; }
+  .final-poem{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:18px; line-height:1.9; letter-spacing:1px;
+    color:var(--ink); text-shadow:none; margin-bottom:8px; padding:0 6px; }
+  .final-time{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
+  .home-btn-row{ display:flex; gap:10px; margin-top:16px; width:92%; max-width:380px; }
+  .home-btn-row button{ flex:1; padding:11px 6px; border:none; border-radius:8px; font-size:14px; font-weight:bold;
+    cursor:pointer; color:#3a2c04; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+  .start-btn{ background:linear-gradient(180deg,#fff0b8,#d9a020); }
+  .translate-btn2{ background:linear-gradient(180deg,#fff0b8,#d9a020); }
+  #toggleTransBtn{ margin-top:22px; }
+
+  .mute-btn{ background:none; border:1px solid rgba(92,68,8,0.4); color:inherit;
+    padding:6px 14px; border-radius:16px; font-size:12px; cursor:pointer; margin-top:4px; opacity:.85; }
+
+  [hidden]{ display:none !important; }
+
+</style>
+</head>
+<body>
+
+<div class="scene-bg" aria-hidden="true">
+  <div class="ambient-wrap" id="ambientWrap"></div>
+  <div class="sil sil-back"></div>
+  <div class="sil sil-front"></div>
+</div>
+
+<div id="timer">思考時間 00:00</div>
+<div class="font-controls">
+  <button onclick="adjustFont(-1)" aria-label="縮小字體">A-</button>
+  <button onclick="adjustFont(1)" aria-label="放大字體">A+</button>
+</div>
+
+<div id="home" class="page">
+  <p class="eyebrow">聖經記憶遊戲 · 聖經都是神所默示的</p>
+  <h1 class="poem-title">提摩太後書 3:16</h1>
+  <p class="poet-line">新約 · 保羅對提摩太的教導</p>
+  <div class="preview-line" id="previewLine"></div>
+  <button class="candle-btn" onclick="enterGame()">📖 領受默示，開始拼經文</button>
+  <button class="ghost-btn" onclick="toggleFull()">閱讀全文</button>
+  <div id="fullPanel" class="full-panel" hidden>
+    <div class="full-text">「聖經都是神所默示的，於教訓、督責、使人歸正、教導人學義都是有益的。」</div>
+    <div class="full-trans">提摩太後書 3:16</div>
+  </div>
+</div>
+
+<div id="game" class="page" hidden>
+  <div class="progress-dots" id="progressDots"></div>
+  <div class="window-scene">
+    <div class="light-holder" id="candleHolder"><div class="orb"></div><div class="book"></div></div>
+    <div class="window-frame">
+      <div class="glass" id="glass">
+        <div id="slots" class="slots-row"></div>
+      </div>
+    </div>
+  </div>
+  <div id="dropZone" class="drop-zone"></div>
+  <div class="controls-row">
+    <button class="ctrl-btn" id="hintBtn" onclick="giveHint()">💡 提示</button>
+    <button class="ctrl-btn" onclick="undoLast()">⟲ 更正</button>
+    <button class="ctrl-btn" onclick="speakCurrentLine()">🔊 聽這句</button>
+    <button class="ctrl-btn home-btn" onclick="goHome()">🏠 回首頁</button>
+  </div>
+</div>
+
+<div id="finish" class="page" hidden>
+  <div class="seal">默示</div>
+  <h2>經文拼寫完成，聖經都是神所默示的</h2>
+  <div class="final-poem">「聖經都是神所默示的，於教訓、督責、使人歸正、教導人學義都是有益的。」</div>
+  <p class="final-time" id="finalTime"></p>
+
+  <div class="home-btn-row">
+    <button class="start-btn" onclick="replay()">再玩一次</button>
+    <button class="translate-btn2" onclick="goHome()">回首頁</button>
+  </div>
+
+  <button class="ghost-btn" id="toggleTransBtn" onclick="toggleFinalTrans()">🙏 查看祝福的話</button>
+  <br>
+  <button class="mute-btn" onclick="stopNarration()">🔇 不想聽語音了</button>
+  <div id="finalTransPanel" class="full-panel" hidden>
+    <div class="full-trans">願你相信聖經都是神所默示的，樂意藉著它受教訓、被督責、得歸正，也在義上受教導。<br>願神的話天天更新你的心思意念。</div>
+  </div>
+</div>
+
+<script>
+
+(function(){
+  "use strict";
+
+  var lines = [
+    { chars:["聖","經","都","是","神","所","默","示","的"], punct:"，" },
+    { chars:["於","教","訓"], punct:"、" },
+    { chars:["督","責"], punct:"、" },
+    { chars:["使","人","歸","正"], punct:"、" },
+    { chars:["教","導","人","學","義","都","是","有","益","的"], punct:"。" }
+  ];
+
+  var fullVerseSpeech = "聖經都是神所默示的，於教訓、督責、使人歸正、教導人學義都是有益的。";
+  var blessingSpeech = "願你相信聖經都是神所默示的，樂意藉著它受教訓、被督責、得歸正，也在義上受教導。願神的話天天更新你的心思意念。";
+
+  function styleDrop(el){
+    el.style.animationDelay = (-Math.random() * 2.4).toFixed(2) + 's';
+  }
+
+  var currentLine = 0;
+  var activeCluster = null;
+  var seconds = 0, timerStarted = false, timerInterval = null, fallInterval = null;
+  var fontLevel = 0;
+
+  function buildAmbient(){
+    var wrap = document.getElementById('ambientWrap');
+    var n = 26;
+    for (var i = 0; i < n; i++){
+      var d = document.createElement('div');
+      d.className = 'ambient-drop';
+      var dur = (3 + Math.random() * 3).toFixed(2);
+      d.style.left = (Math.random() * 100).toFixed(1) + '%';
+      d.style.setProperty('--drift', (10 + Math.random() * 40).toFixed(0) + 'px');
+      d.style.animationDuration = dur + 's';
+      d.style.animationDelay = (-Math.random() * dur).toFixed(2) + 's';
+      wrap.appendChild(d);
+    }
+  }
+
+  function buildPreview(){
+    var el = document.getElementById('previewLine');
+    var text = "聖經都是神所默示的";
+    el.innerHTML = '';
+    text.split('').forEach(function(ch, i){
+      var s = document.createElement('span');
+      s.textContent = ch;
+      s.style.animationDelay = (i * 0.18) + 's';
+      el.appendChild(s);
+    });
+  }
+
+  function buildProgressDots(){
+    var wrap = document.getElementById('progressDots');
+    wrap.innerHTML = '';
+    lines.forEach(function(){
+      var span = document.createElement('span');
+      wrap.appendChild(span);
+    });
+  }
+
+  window.toggleFull = function(){
+    var p = document.getElementById('fullPanel');
+    p.hidden = !p.hidden;
+  };
+  window.toggleFinalTrans = function(){
+    var p = document.getElementById('finalTransPanel');
+    p.hidden = !p.hidden;
+  };
+
+  window.adjustFont = function(dir){
+    fontLevel = Math.max(0, Math.min(2, fontLevel + dir));
+    var root = document.documentElement;
+    root.classList.remove('font-l','font-xl');
+    if (fontLevel === 1) root.classList.add('font-l');
+    if (fontLevel === 2) root.classList.add('font-xl');
+  };
+
+  function formatTime(s){
+    var m = Math.floor(s/60).toString().padStart(2,'0');
+    var sec = (s%60).toString().padStart(2,'0');
+    return '思考時間 ' + m + ':' + sec;
+  }
+  function startTimerIfNeeded(){
+    if (!timerStarted){
+      timerStarted = true;
+      timerInterval = setInterval(function(){
+        seconds++;
+        document.getElementById('timer').innerText = formatTime(seconds);
+      }, 1000);
+    }
+  }
+  function stopTimer(){
+    if (timerInterval) clearInterval(timerInterval);
+  }
+
+  window.enterGame = function(){
+    document.getElementById('home').hidden = true;
+    document.getElementById('finish').hidden = true;
+    document.getElementById('game').hidden = false;
+    currentLine = 0;
+    seconds = 0; timerStarted = false;
+    document.getElementById('timer').innerText = formatTime(seconds);
+    buildProgressDots();
+    updateGlow(0);
+    updateProgressDots();
+    loadLine(0);
+  };
+  window.goHome = function(){
+    stopNarration();
+    stopTimer();
+    if (fallInterval) clearInterval(fallInterval);
+    document.body.classList.remove('dawn');
+    document.getElementById('game').hidden = true;
+    document.getElementById('finish').hidden = true;
+    document.getElementById('home').hidden = false;
+  };
+  window.replay = function(){
+    stopNarration();
+    document.body.classList.remove('dawn');
+    document.getElementById('finish').hidden = true;
+    enterGame();
+  };
+  window.stopNarration = function(){
+    try{ window.speechSynthesis.cancel(); }catch(e){}
+  };
+
+  function updateGlow(doneCount){
+    var holder = document.getElementById('candleHolder');
+    var glow = 9 + doneCount * 6;
+    holder.style.setProperty('--glow', glow + 'px');
+  }
+  function updateProgressDots(){
+    var dots = document.querySelectorAll('#progressDots span');
+    dots.forEach(function(d, i){
+      d.classList.toggle('done', i < currentLine);
+    });
+  }
+
+  function loadLine(idx){
+    var line = lines[idx];
+    var slotsDiv = document.getElementById('slots');
+    slotsDiv.innerHTML = '';
+    line.chars.forEach(function(ch){
+      var slot = document.createElement('div');
+      slot.className = 'slot';
+      slot.dataset.char = ch;
+      slotsDiv.appendChild(slot);
+    });
+    if (line.punct){
+      var punct = document.createElement('span');
+      punct.className = 'punct';
+      punct.textContent = line.punct;
+      slotsDiv.appendChild(punct);
+    }
+
+    speakInterrupt(line.chars.join('') + line.punct);
+
+    var shuffled = line.chars.slice().sort(function(){ return Math.random() - 0.5; });
+    spawnCluster(shuffled);
+  }
+
+  function computeZoneHeight(count){
+    var cs = getComputedStyle(document.documentElement);
+    var charSize = parseFloat(cs.getPropertyValue('--char-size')) || 24;
+    var dropSize = charSize + 26;
+    var gap = 8;
+    var zone = document.getElementById('dropZone');
+    var containerWidth = zone.clientWidth * 0.94 || 360;
+    var perRow = Math.max(1, Math.floor((containerWidth + gap) / (dropSize + gap)));
+    var rows = Math.ceil(count / perRow);
+    var h = rows * (dropSize + gap) + 30;
+    return Math.max(120, h);
+  }
+
+  function spawnCluster(chars){
+    var zone = document.getElementById('dropZone');
+    zone.innerHTML = '';
+    zone.style.height = computeZoneHeight(chars.length) + 'px';
+    var cluster = document.createElement('div');
+    cluster.className = 'char-cluster';
+
+    function render(){
+      cluster.innerHTML = '';
+      chars.forEach(function(ch){
+        var drop = document.createElement('div');
+        drop.className = 'char-drop';
+        drop.textContent = ch;
+        styleDrop(drop);
+        drop.onclick = function(e){
+          e.stopPropagation();
+          startTimerIfNeeded();
+          handleTap(ch, drop, chars, cluster, render);
+        };
+        cluster.appendChild(drop);
+      });
+    }
+    render();
+    zone.appendChild(cluster);
+
+    var currentY = -70, targetY = 20;
+    cluster.style.top = currentY + 'px';
+    activeCluster = { element: cluster, chars: chars };
+
+    if (fallInterval) clearInterval(fallInterval);
+    fallInterval = setInterval(function(){
+      if (currentY < targetY){
+        currentY += 2;
+        cluster.style.top = currentY + 'px';
+      } else {
+        clearInterval(fallInterval);
+      }
+    }, 30);
+  }
+
+  function handleTap(ch, dropEl, chars, clusterEl, renderFn){
+    var targetSlot = document.querySelector('#slots .slot:not(.filled)');
+    if (!targetSlot) return;
+    if (ch === targetSlot.dataset.char){
+      targetSlot.textContent = ch;
+      targetSlot.classList.add('filled');
+      targetSlot.classList.remove('hint-target');
+
+      var glass = document.getElementById('glass');
+      glass.classList.remove('ripple');
+      void glass.offsetWidth;
+      glass.classList.add('ripple');
+
+      dropEl.onclick = null;
+      dropEl.classList.add('pop');
+
+      setTimeout(function(){
+        var idx = chars.indexOf(ch);
+        if (idx > -1) chars.splice(idx, 1);
+
+        if (chars.length === 0){
+          onLineComplete();
+        } else {
+          renderFn();
+        }
+      }, 220);
+    } else {
+      dropEl.classList.remove('wrong-shake');
+      void dropEl.offsetWidth;
+      dropEl.classList.add('wrong-shake');
+    }
+  }
+
+  function onLineComplete(){
+    if (fallInterval) clearInterval(fallInterval);
+    document.getElementById('dropZone').innerHTML = '';
+    activeCluster = null;
+
+    var line = lines[currentLine];
+
+    currentLine++;
+    updateGlow(currentLine);
+    updateProgressDots();
+
+    var isLast = currentLine >= lines.length;
+    speak(line.chars.join('') + line.punct, function(){
+      setTimeout(function(){
+        if (isLast){ finishGame(); } else { loadLine(currentLine); }
+      }, 450);
+    });
+  }
+
+  window.undoLast = function(){
+    var filled = document.querySelectorAll('#slots .slot.filled');
+    if (filled.length === 0) return;
+    var lastSlot = filled[filled.length - 1];
+    var ch = lastSlot.dataset.char;
+    lastSlot.textContent = '';
+    lastSlot.classList.remove('filled');
+
+    if (activeCluster){
+      activeCluster.chars.push(ch);
+      var zone = document.getElementById('dropZone');
+      var clusterEl = zone.querySelector('.char-cluster');
+      if (clusterEl){
+        renderClusterDom(clusterEl, activeCluster.chars);
+      }
+    }
+  };
+  function renderClusterDom(clusterEl, chars){
+    clusterEl.innerHTML = '';
+    chars.forEach(function(ch){
+      var drop = document.createElement('div');
+      drop.className = 'char-drop';
+      drop.textContent = ch;
+      styleDrop(drop);
+      drop.onclick = function(e){
+        e.stopPropagation();
+        startTimerIfNeeded();
+        handleTap(ch, drop, chars, clusterEl, function(){ renderClusterDom(clusterEl, chars); });
+      };
+      clusterEl.appendChild(drop);
+    });
+  }
+
+  window.giveHint = function(){
+    var targetSlot = document.querySelector('#slots .slot:not(.filled)');
+    if (!targetSlot) return;
+    targetSlot.classList.add('hint-target');
+    setTimeout(function(){ targetSlot.classList.remove('hint-target'); }, 2400);
+
+    var ch = targetSlot.dataset.char;
+    var drops = document.querySelectorAll('.char-drop');
+    drops.forEach(function(d){
+      if (d.textContent === ch){
+        d.classList.add('hint-glow');
+        setTimeout(function(){ d.classList.remove('hint-glow'); }, 1200);
+      }
+    });
+  };
+
+  function speak(text, onDone){
+    var done = false;
+    function finish(){
+      if (!done){ done = true; if (onDone) onDone(); }
+    }
+    try{
+      var msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'zh-TW';
+      msg.rate = 0.85;
+      msg.onend = finish;
+      msg.onerror = finish;
+      window.speechSynthesis.speak(msg);
+      var estMs = Math.min(14000, Math.max(1200, text.length * 340));
+      setTimeout(finish, estMs);
+    }catch(e){
+      finish();
+    }
+  }
+  function speakInterrupt(text){
+    try{
+      window.speechSynthesis.cancel();
+      var msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'zh-TW';
+      msg.rate = 0.85;
+      window.speechSynthesis.speak(msg);
+    }catch(e){}
+  }
+  window.speakCurrentLine = function(){
+    if (currentLine < lines.length){
+      var line = lines[currentLine];
+      speakInterrupt(line.chars.join('') + line.punct);
+    }
+  };
+
+  function finishGame(){
+    stopTimer();
+    document.getElementById('game').hidden = true;
+    document.getElementById('finish').hidden = false;
+    document.body.classList.add('dawn');
+    document.getElementById('finalTime').textContent = '本次思考時間 ' + formatTime(seconds).replace('思考時間 ','');
+
+    if (window.confetti){
+      confetti({
+        particleCount: 140,
+        spread: 90,
+        origin: { y: 0.55 },
+        colors: ["#fff0b8","#fff6c8","#f0c860","#d9a020"]
+      });
+    }
+
+    speak('太棒了，整節經文都拼好了', function(){
+      setTimeout(function(){
+        speak(fullVerseSpeech, function(){
+          setTimeout(function(){
+            var panel = document.getElementById('finalTransPanel');
+            panel.hidden = false;
+            speak(blessingSpeech, function(){});
+          }, 500);
+        });
+      }, 500);
+    });
+  }
+
+  buildAmbient();
+  buildPreview();
+})();
+
+</script>
+</body>
+</html>
