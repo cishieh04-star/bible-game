@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>心殿之光</title>
+<title>破曉新生</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
   :root{
-    --sky-top:#fff6e0;
-    --sky-mid:#ffe2a8;
-    --sky-bottom:#f0c274;
-    --gold:#c9862a;
-    --ink:#5a4015;
-    --ink-soft:rgba(90,64,21,0.78);
-    --pillar:#c9a15f;
-    --seal-gold:#c9862a;
-    --glass-bg:rgba(255,251,236,0.36);
+    --sky-top:#4a5f8a;
+    --sky-mid:#e8927c;
+    --sky-bottom:#ffd9a0;
+    --gold:#e0965a;
+    --ink:#3a3550;
+    --ink-soft:rgba(58,53,80,0.78);
+    --bridge:#6b6f8f;
+    --seal-gold:#e0965a;
+    --glass-bg:rgba(255,251,244,0.4);
     --char-size:24px;
     --caption-size:16px;
   }
@@ -32,55 +32,47 @@
     padding:10px 12px 30px;
     transition:background 1.2s ease;
   }
-  /* 完成畫面：殿中的光更明亮，象徵神的靈充滿 */
+  /* 完成畫面：天光更加明亮溫暖，象徵出死入生、迎向新的一天 */
   body.dawn{
-    background:linear-gradient(to bottom, #fffbf0 0%, #ffedc0 45%, #ffdc98 100%);
+    background:linear-gradient(to bottom, #fef0da 0%, #ffd9a8 45%, #ffc688 100%);
   }
-  body.dawn .pillars-back{ opacity:.5; }
-  body.dawn .pillars-front{ opacity:.65; }
+  body.dawn .bridge{ opacity:.65; }
+  body.dawn .sunball{ transform:translateX(-50%) scale(1.15); }
 
-  /* ---------- 聖殿場景背景 ---------- */
+  /* ---------- 破曉場景背景 ---------- */
   .scene-bg{ position:fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
-  .scene-bg::before{ content:''; position:absolute; top:-15%; left:50%; width:80%; padding-top:80%;
-    transform:translateX(-50%); border-radius:50%;
-    background:radial-gradient(circle, rgba(255,255,255,0.55), transparent 68%); }
-  .ambient-light{ position:absolute; inset:0; }
-  .ambient-drop{
-    position:absolute; bottom:-5%; width:4px; height:4px; border-radius:50%;
-    background:radial-gradient(circle, #fffbe0, #ffcf6e 70%);
-    box-shadow:0 0 5px rgba(255,207,110,0.9);
-    animation-name:motesRise; animation-timing-function:ease-in-out; animation-iteration-count:infinite;
+  .sunball{ position:absolute; bottom:8%; left:50%; width:180px; height:180px; transform:translateX(-50%);
+    border-radius:50%; background:radial-gradient(circle, #fff3d0, #ffcf8c 60%, rgba(255,207,140,0) 75%);
+    transition:transform 1.2s ease; }
+  .ambient-birds{ position:absolute; inset:0; }
+  .bird{ position:absolute; font-size:14px; color:rgba(58,53,80,0.55);
+    animation-name:birdFly; animation-timing-function:ease-in-out; animation-iteration-count:infinite; }
+  .bird::before{ content:'⌃'; display:block; transform:scaleX(1.6); }
+  @keyframes birdFly{
+    0%{ transform:translateX(-10vw) translateY(0); opacity:0; }
+    12%{ opacity:.8; }
+    88%{ opacity:.6; }
+    100%{ transform:translateX(120vw) translateY(-30px); opacity:0; }
   }
-  @keyframes motesRise{
-    0%{ bottom:-5%; opacity:0; transform:translateX(0); }
-    15%{ opacity:.95; }
-    85%{ opacity:.55; }
-    100%{ bottom:100%; opacity:0; transform:translateX(var(--drift,20px)); }
-  }
-  .pillars{ position:absolute; bottom:0; left:0; width:100%; display:flex; justify-content:space-evenly;
-    align-items:flex-end; transition:opacity 1.2s ease; }
-  .pillars-back{ height:120px; opacity:.5; }
-  .pillars-front{ height:84px; }
-  .pillar{ width:16px; background:linear-gradient(180deg,#d9b578,#a9803f); border-radius:3px 3px 0 0;
-    box-shadow:0 0 0 1px rgba(120,85,30,0.2) inset; position:relative; }
-  .pillars-back .pillar{ height:100%; background:linear-gradient(180deg,#e0c48f,#b8945a); }
-  .pillars-front .pillar{ height:100%; }
-  .pillar::before{ content:''; position:absolute; top:-6px; left:-3px; right:-3px; height:8px;
-    background:inherit; border-radius:3px; }
+  .bridge{ position:absolute; bottom:0; left:0; width:100%; transition:opacity 1.2s ease; opacity:.5; }
+  .bridge-back{ height:90px; background:#8890b0;
+    clip-path:polygon(0 100%,0 85%,8% 85%,8% 40%,20% 20%,32% 40%,32% 85%,68% 85%,68% 40%,80% 20%,92% 40%,92% 85%,100% 85%,100% 100%); }
+  .bridge-front{ height:56px; background:#6b6f8f;
+    clip-path:polygon(0 100%,0 90%,15% 90%,15% 55%,30% 35%,45% 55%,45% 90%,55% 90%,55% 55%,70% 35%,85% 55%,85% 90%,100% 90%,100% 100%); }
 
   .page{ position:relative; z-index:2; width:100%; max-width:480px; }
 
   #timer{ position:fixed; top:10px; left:12px; font-size:13px; color:var(--ink);
-    background:rgba(255,255,255,0.5); padding:4px 10px; border-radius:10px; border:1px solid rgba(90,64,21,0.3); z-index:1000; }
+    background:rgba(255,255,255,0.5); padding:4px 10px; border-radius:10px; border:1px solid rgba(58,53,80,0.3); z-index:1000; }
   .font-controls{ position:fixed; top:10px; right:12px; z-index:1000; display:flex; gap:6px; }
-  .font-controls button{ width:30px; height:30px; border-radius:8px; border:1px solid rgba(90,64,21,0.35);
+  .font-controls button{ width:30px; height:30px; border-radius:8px; border:1px solid rgba(58,53,80,0.35);
     background:rgba(255,255,255,0.5); color:var(--ink); font-size:13px; font-weight:bold; cursor:pointer; }
 
   /* ---------- 首頁 ---------- */
   #home{ text-align:center; padding-top:7vh; min-height:88vh; display:flex; flex-direction:column; align-items:center; }
   .eyebrow{ font-size:13px; letter-spacing:2px; color:var(--ink-soft); margin:0 0 6px; }
-  .poem-title{ font-size:25px; margin:0; letter-spacing:3px; color:#8a5f1a;
-    font-family:"KaiTi","STKaiti","BiauKai",serif; text-shadow:0 0 18px rgba(201,134,42,0.5); }
+  .poem-title{ font-size:25px; margin:0; letter-spacing:3px; color:#b5622f;
+    font-family:"KaiTi","STKaiti","BiauKai",serif; text-shadow:0 0 18px rgba(224,150,90,0.5); }
   .poet-line{ margin:6px 0 22px; font-size:14px; color:var(--ink-soft); }
   .preview-line{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:22px; letter-spacing:4px;
     color:var(--ink); min-height:34px; margin-bottom:26px; }
@@ -88,69 +80,67 @@
   @keyframes charFadeIn{ to{ opacity:1; } }
 
   .candle-btn{ font-size:17px; font-weight:bold; padding:14px 28px; border:none; border-radius:30px;
-    background:linear-gradient(180deg,#ffdb8a,#c9862a); color:#4a3006; cursor:pointer;
-    box-shadow:0 0 22px rgba(201,134,42,0.5); margin-bottom:14px; }
-  .ghost-btn{ background:none; border:1px solid rgba(90,64,21,0.4); color:var(--ink);
+    background:linear-gradient(180deg,#ffd9a0,#e0965a); color:#4a2408; cursor:pointer;
+    box-shadow:0 0 22px rgba(224,150,90,0.5); margin-bottom:14px; }
+  .ghost-btn{ background:none; border:1px solid rgba(58,53,80,0.4); color:var(--ink);
     padding:9px 18px; border-radius:20px; font-size:13px; cursor:pointer; }
   .full-panel{ margin-top:16px; width:92%; max-width:420px; background:rgba(255,255,255,0.42);
-    border:1px solid rgba(90,64,21,0.3); border-radius:12px; padding:14px 16px; text-align:left; }
+    border:1px solid rgba(58,53,80,0.3); border-radius:12px; padding:14px 16px; text-align:left; }
   .full-text{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:17px; line-height:1.9; color:var(--ink); }
   .full-trans{ margin-top:10px; font-size:13px; line-height:1.7; color:var(--ink-soft); }
 
   /* ---------- 遊戲畫面 ---------- */
   #game{ display:flex; flex-direction:column; align-items:center; padding-top:2vh; }
-  .progress-dots{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; max-width:260px; }
-  .progress-dots span{ width:9px; height:9px; border-radius:50%; background:rgba(90,64,21,0.2);
-    border:1px solid rgba(90,64,21,0.4); transition:background .4s; }
-  .progress-dots span.done{ background:#c9862a; box-shadow:0 0 8px rgba(201,134,42,0.7); }
+  .progress-dots{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; max-width:280px; }
+  .progress-dots span{ width:9px; height:9px; border-radius:50%; background:rgba(58,53,80,0.2);
+    border:1px solid rgba(58,53,80,0.4); transition:background .4s; }
+  .progress-dots span.done{ background:#e0784a; box-shadow:0 0 8px rgba(224,120,74,0.7); }
 
-  .window-scene{ position:relative; display:flex; align-items:flex-end; justify-content:center; gap:6px; width:100%; }
-  .window-scene::before{ content:''; position:absolute; top:10%; left:50%; width:240px; height:240px;
+  .window-scene{ position:relative; display:flex; align-items:flex-start; justify-content:center; gap:6px; width:100%; }
+  .window-scene::before{ content:''; position:absolute; top:15%; left:50%; width:240px; height:240px;
     transform:translate(-50%,-30%); border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle, rgba(255,220,140,0.4), transparent 70%); z-index:-1; }
-  .light-holder{ position:relative; width:34px; height:82px; margin-bottom:16px; flex-shrink:0;
-    filter:drop-shadow(0 0 var(--glow,8px) #ffcf6e); transition:filter .6s; display:flex; align-items:flex-end; justify-content:center; }
-  .light-holder .base{ position:absolute; bottom:0; width:28px; height:10px; left:50%; transform:translateX(-50%);
-    background:linear-gradient(180deg,#c9a15f,#8a6a34); border-radius:3px; }
-  .light-holder .stem{ position:absolute; bottom:8px; width:5px; height:36px; left:50%; transform:translateX(-50%);
-    background:linear-gradient(180deg,#d9b578,#a9803f); border-radius:2px; }
-  .light-holder .orb{ width:24px; height:24px; border-radius:50%; margin-bottom:44px;
-    background:radial-gradient(circle at 35% 30%, #fffbe0, #ffe08a 55%, #c9862a 90%);
-    animation:glow 2.1s ease-in-out infinite; }
+    background:radial-gradient(circle, rgba(255,214,170,0.4), transparent 70%); z-index:-1; }
+  .light-holder{ position:relative; width:34px; height:78px; margin-top:16px; flex-shrink:0;
+    filter:drop-shadow(0 0 var(--glow,6px) #ffe0ae); transition:filter .6s; display:flex; align-items:flex-end; justify-content:center; }
+  .light-holder .stem{ position:absolute; bottom:0; width:4px; height:34px; background:linear-gradient(180deg,#e0965a,#b5622f);
+    border-radius:2px; left:50%; transform:translateX(-50%); }
+  .light-holder .orb{ width:24px; height:24px; border-radius:50%; margin-bottom:30px;
+    background:radial-gradient(circle at 35% 30%, #ffffff, #ffe0ae 55%, #e0965a 92%);
+    animation:glow 2.2s ease-in-out infinite; }
   @keyframes glow{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12); } }
 
-  .window-frame{ background:linear-gradient(160deg,#e6cf9e,#b89860); border:3px solid #cbab72;
-    border-radius:10px; padding:8px; width:100%; max-width:390px; box-shadow:0 6px 18px rgba(120,90,30,0.28); }
+  .window-frame{ background:linear-gradient(160deg,#e6d9c8,#b8a598); border:3px solid #cbb9a8;
+    border-radius:10px; padding:8px; width:100%; max-width:390px; box-shadow:0 6px 18px rgba(90,70,50,0.28); }
   .glass{ position:relative; background:var(--glass-bg); border-radius:6px; padding:14px 8px;
     min-height:70px; display:flex; align-items:center; justify-content:center; overflow:hidden;
-    box-shadow:inset 0 0 24px rgba(120,90,30,0.18); }
+    box-shadow:inset 0 0 24px rgba(90,70,50,0.18); }
   .glass.ripple::after{ content:''; position:absolute; inset:0; border-radius:6px;
-    background:radial-gradient(circle, rgba(201,134,42,0.4), transparent 65%);
+    background:radial-gradient(circle, rgba(224,150,90,0.4), transparent 65%);
     animation:rippleAnim .55s ease-out; }
   @keyframes rippleAnim{ 0%{ opacity:0; transform:scale(.6);} 40%{ opacity:1;} 100%{ opacity:0; transform:scale(1.3);} }
 
   .slots-row{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; align-items:center; }
   .slot{ width:calc(var(--char-size) + 16px); height:calc(var(--char-size) + 16px);
-    border:2px dashed rgba(120,90,30,0.55); border-radius:8px; display:flex; align-items:center;
+    border:2px dashed rgba(90,70,50,0.5); border-radius:8px; display:flex; align-items:center;
     justify-content:center; font-size:var(--char-size); font-weight:bold; color:var(--ink);
-    font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.3); }
-  .slot.filled{ border-style:solid; border-color:#c9862a; color:#8a5f1a;
-    text-shadow:0 0 6px rgba(201,134,42,0.4); background:rgba(201,134,42,0.14); }
+    font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.32); }
+  .slot.filled{ border-style:solid; border-color:#e0784a; color:#b5622f;
+    text-shadow:0 0 6px rgba(224,120,74,0.4); background:rgba(224,120,74,0.13); }
   .slot.hint-target{ animation:hintPulse 1.2s ease-in-out infinite; }
-  @keyframes hintPulse{ 0%,100%{ box-shadow:0 0 0 rgba(201,134,42,0.6);} 50%{ box-shadow:0 0 14px rgba(201,134,42,0.9);} }
+  @keyframes hintPulse{ 0%,100%{ box-shadow:0 0 0 rgba(224,120,74,0.6);} 50%{ box-shadow:0 0 14px rgba(224,120,74,0.9);} }
   .punct{ font-size:calc(var(--char-size) - 4px); color:var(--ink-soft); margin:0 1px; align-self:flex-end; }
 
   .drop-zone{ width:100%; max-width:390px; height:120px; position:relative; margin-top:6px;
-    border-radius:10px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+    border-radius:10px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.18), transparent);
     transition:height .3s ease; }
   .char-cluster{ position:absolute; left:50%; top:-70px; transform:translateX(-50%); display:flex; gap:8px;
     flex-wrap:wrap; justify-content:center; width:94%; transition:top .05s linear; }
   .char-drop{ width:calc(var(--char-size) + 26px); height:calc(var(--char-size) + 26px); border-radius:50%;
-    background:radial-gradient(circle at 32% 28%, #5a4015, #332508 78%); color:#fff8e0;
+    background:radial-gradient(circle at 32% 28%, #4a4560, #2a2640 78%); color:#fdf3e2;
     display:flex; align-items:center; justify-content:center; font-size:var(--char-size); font-weight:bold;
-    cursor:pointer; user-select:none; box-shadow:0 4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(201,134,42,0.4);
+    cursor:pointer; user-select:none; box-shadow:0 4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(224,150,90,0.4);
     font-family:"KaiTi","STKaiti","BiauKai",serif; flex-shrink:0; text-shadow:0 1px 2px rgba(0,0,0,0.4);
-    border:1.5px solid rgba(255,224,160,0.4);
+    border:1.5px solid rgba(255,224,174,0.4);
     animation:bob 2.4s ease-in-out infinite; transition:transform .18s ease; }
   .char-drop:active{ transform:scale(0.9); }
   @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(-2deg); } 50%{ transform:translateY(-5px) rotate(2deg); } }
@@ -161,30 +151,30 @@
   @keyframes popAway{ 0%{ transform:scale(1); opacity:1; } 60%{ transform:scale(1.35); opacity:1; } 100%{ transform:scale(0.2); opacity:0; } }
 
   .controls-row{ display:flex; gap:8px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
-  .ctrl-btn{ padding:9px 14px; border:1px solid rgba(90,64,21,0.4); border-radius:20px;
+  .ctrl-btn{ padding:9px 14px; border:1px solid rgba(58,53,80,0.4); border-radius:20px;
     background:rgba(255,255,255,0.4); color:var(--ink); font-size:13px; font-weight:bold; cursor:pointer; }
   .ctrl-btn.home-btn{ background:rgba(255,255,255,0.55); }
 
   /* ---------- 完成畫面：再玩一次／回首頁 放在最前面 ---------- */
   #finish{ text-align:center; padding-top:6vh; display:flex; flex-direction:column; align-items:center; }
-  .seal{ width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffe9ae, var(--seal-gold) 75%);
-    color:#4a3006; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold;
+  .seal{ width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffe4b0, var(--seal-gold) 75%);
+    color:#4a2408; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold;
     font-family:"KaiTi","STKaiti","BiauKai",serif; letter-spacing:1px;
-    box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 4px 14px rgba(180,120,20,0.4); transform:scale(0);
+    box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 4px 14px rgba(180,90,20,0.4); transform:scale(0);
     animation:stampIn .5s cubic-bezier(.34,1.56,.64,1) forwards; margin-bottom:10px; }
   @keyframes stampIn{ to{ transform:scale(1); } }
-  #finish h2{ margin:2px 0 12px; font-size:18px; color:#8a5f1a; }
+  #finish h2{ margin:2px 0 12px; font-size:18px; color:#b5622f; }
   .final-poem{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:18px; line-height:1.9; letter-spacing:1px;
     color:var(--ink); text-shadow:none; margin-bottom:8px; padding:0 6px; }
   .final-time{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
   .home-btn-row{ display:flex; gap:10px; margin-top:16px; width:92%; max-width:380px; }
   .home-btn-row button{ flex:1; padding:11px 6px; border:none; border-radius:8px; font-size:14px; font-weight:bold;
-    cursor:pointer; color:#4a3006; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
-  .start-btn{ background:linear-gradient(180deg,#ffe9ae,#c9862a); }
-  .translate-btn2{ background:linear-gradient(180deg,#ffd88a,#b8742a); }
+    cursor:pointer; color:#4a2408; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+  .start-btn{ background:linear-gradient(180deg,#ffd9a0,#e0965a); color:#4a2408; }
+  .translate-btn2{ background:linear-gradient(180deg,#c8d4ff,#8890b0); color:#2a2640; }
   #toggleTransBtn{ margin-top:22px; }
 
-  .mute-btn{ background:none; border:1px solid rgba(90,64,21,0.4); color:inherit;
+  .mute-btn{ background:none; border:1px solid rgba(58,53,80,0.4); color:inherit;
     padding:6px 14px; border-radius:16px; font-size:12px; cursor:pointer; margin-top:4px; opacity:.85; }
 
   [hidden]{ display:none !important; }
@@ -194,9 +184,10 @@
 
 
 <div class="scene-bg" aria-hidden="true">
-  <div class="ambient-light" id="ambientLight"></div>
-  <div class="pillars pillars-back" id="pillarsBack"></div>
-  <div class="pillars pillars-front" id="pillarsFront"></div>
+  <div class="sunball" id="sunball"></div>
+  <div class="ambient-birds" id="ambientBirds"></div>
+  <div class="bridge bridge-back"></div>
+  <div class="bridge bridge-front"></div>
 </div>
 
 <div id="timer">思考時間 00:00</div>
@@ -205,17 +196,17 @@
   <button onclick="adjustFont(1)" aria-label="放大字體">A+</button>
 </div>
 
-<!-- 首頁：聖殿之光情境優先，文字精簡 -->
+<!-- 首頁：破曉過橋情境優先，文字精簡 -->
 <div id="home" class="page">
-  <p class="eyebrow">聖經記憶遊戲 · 神的靈住在你心中</p>
-  <h1 class="poem-title">哥林多前書 3:16</h1>
-  <p class="poet-line">新約 · 保羅的提醒</p>
+  <p class="eyebrow">聖經記憶遊戲 · 出死入生，迎向新的一天</p>
+  <h1 class="poem-title">約翰福音 5:24</h1>
+  <p class="poet-line">新約 · 耶穌的應許</p>
   <div class="preview-line" id="previewLine"></div>
-  <button class="candle-btn" onclick="enterGame()">🕯️ 點亮心殿，開始拼經文</button>
+  <button class="candle-btn" onclick="enterGame()">🌅 走向晨光，開始拼經文</button>
   <button class="ghost-btn" onclick="toggleFull()">閱讀全文</button>
   <div id="fullPanel" class="full-panel" hidden>
-    <div class="full-text">「豈不知你們是神的殿，神的靈住在你們裡頭嗎？」</div>
-    <div class="full-trans">哥林多前書 3:16</div>
+    <div class="full-text">「我實實在在的告訴你們，那聽我話、又信差我來者的，就有永生，不至於定罪，是已經出死入生了。」</div>
+    <div class="full-trans">約翰福音 5:24</div>
   </div>
 </div>
 
@@ -223,7 +214,7 @@
 <div id="game" class="page" hidden>
   <div class="progress-dots" id="progressDots"></div>
   <div class="window-scene">
-    <div class="light-holder" id="candleHolder"><div class="orb"></div><div class="stem"></div><div class="base"></div></div>
+    <div class="light-holder" id="candleHolder"><div class="orb"></div><div class="stem"></div></div>
     <div class="window-frame">
       <div class="glass" id="glass">
         <div id="slots" class="slots-row"></div>
@@ -241,9 +232,9 @@
 
 <!-- 完成畫面 -->
 <div id="finish" class="page" hidden>
-  <div class="seal">聖殿</div>
-  <h2>經文拼寫完成，願聖靈常住你心</h2>
-  <div class="final-poem">「豈不知你們是神的殿，神的靈住在你們裡頭嗎？」</div>
+  <div class="seal">新生</div>
+  <h2>經文拼寫完成，願你天天活在新生命裡</h2>
+  <div class="final-poem">「我實實在在的告訴你們，那聽我話、又信差我來者的，就有永生，不至於定罪，是已經出死入生了。」</div>
   <p class="final-time" id="finalTime"></p>
 
   <div class="home-btn-row">
@@ -255,7 +246,7 @@
   <br>
   <button class="mute-btn" onclick="stopNarration()">🔇 不想聽語音了</button>
   <div id="finalTransPanel" class="full-panel" hidden>
-    <div class="full-trans">願神的靈天天住在你心中，願你的生命成為榮耀祂的居所。<br>願恩典時時充滿你，平安喜樂常伴你左右。</div>
+    <div class="full-trans">願你天天活在主所賜的新生命裡，不再懼怕、不再憂慮。<br>願你時時經歷從死入生的平安，喜樂常伴你左右。</div>
   </div>
 </div>
 
@@ -263,16 +254,20 @@
 (function(){
   "use strict";
 
-  // 以標點符號為界分段，讓每個語詞連在同一句唸出，語音才會唸對破音字與語意
+  // 以標點符號為界分段（含頓號、），讓每個語詞連在同一句唸出，語音才會唸對破音字與語意
   var lines = [
-    { chars:["豈","不","知","你","們","是","神","的","殿"], punct:"，" },
-    { chars:["神","的","靈","住","在","你","們","裡","頭","嗎"], punct:"？" }
+    { chars:["我","實","實","在","在","的","告","訴","你","們"], punct:"，" },
+    { chars:["那","聽","我","話"], punct:"、" },
+    { chars:["又","信","差","我","來","者","的"], punct:"，" },
+    { chars:["就","有","永","生"], punct:"，" },
+    { chars:["不","至","於","定","罪"], punct:"，" },
+    { chars:["是","已","經","出","死","入","生","了"], punct:"。" }
   ];
 
   // 聖經解釋見解多元，遊戲中不對經文逐段加註解釋——完成整段經文後，
   // 只完整讀一次經文原文，再讀出這節經文的祝福話語。
-  var fullVerseSpeech = "豈不知你們是神的殿，神的靈住在你們裡頭嗎？";
-  var blessingSpeech = "願神的靈天天住在你心中，願你的生命成為榮耀祂的居所。願恩典時時充滿你，平安喜樂常伴你左右。";
+  var fullVerseSpeech = "我實實在在的告訴你們，那聽我話、又信差我來者的，就有永生，不至於定罪，是已經出死入生了。";
+  var blessingSpeech = "願你天天活在主所賜的新生命裡，不再懼怕、不再憂慮。願你時時經歷從死入生的平安，喜樂常伴你左右。";
 
   /* 選字物件統一使用單一深色（見 CSS .char-drop），只保留錯開的浮動節奏，
      方便長輩辨識文字、不因顏色混雜而分心或看不清楚 */
@@ -285,38 +280,26 @@
   var seconds = 0, timerStarted = false, timerInterval = null, fallInterval = null;
   var fontLevel = 0;
 
-  /* ---------- 環境金光微塵（裝飾用，不可點擊） ---------- */
-  function buildAmbientLight(){
-    var wrap = document.getElementById('ambientLight');
-    var n = 26;
+  /* ---------- 環境飛鳥（裝飾用，不可點擊） ---------- */
+  function buildAmbientBirds(){
+    var wrap = document.getElementById('ambientBirds');
+    var n = 6;
     for (var i = 0; i < n; i++){
       var d = document.createElement('div');
-      d.className = 'ambient-drop';
-      var dur = (3 + Math.random() * 3).toFixed(2);
-      d.style.left = (Math.random() * 100).toFixed(1) + '%';
-      d.style.setProperty('--drift', (10 + Math.random() * 40).toFixed(0) + 'px');
+      d.className = 'bird';
+      var dur = (9 + Math.random() * 6).toFixed(2);
+      d.style.top = (10 + Math.random() * 40).toFixed(1) + '%';
+      d.style.fontSize = (12 + Math.random() * 8).toFixed(0) + 'px';
       d.style.animationDuration = dur + 's';
       d.style.animationDelay = (-Math.random() * dur).toFixed(2) + 's';
       wrap.appendChild(d);
     }
   }
 
-  /* ---------- 柱廊剪影 ---------- */
-  function buildPillars(){
-    [['pillarsBack', 7], ['pillarsFront', 5]].forEach(function(cfg){
-      var wrap = document.getElementById(cfg[0]);
-      for (var i = 0; i < cfg[1]; i++){
-        var p = document.createElement('div');
-        p.className = 'pillar';
-        wrap.appendChild(p);
-      }
-    });
-  }
-
   /* ---------- 首頁：逐字浮現預覽句 ---------- */
   function buildPreview(){
     var el = document.getElementById('previewLine');
-    var text = "豈不知你們";
+    var text = "就有永生";
     el.innerHTML = '';
     text.split('').forEach(function(ch, i){
       var s = document.createElement('span');
@@ -405,10 +388,10 @@
     try{ window.speechSynthesis.cancel(); }catch(e){}
   };
 
-  /* ---------- 殿中的光：完成愈多段，光愈亮 ---------- */
+  /* ---------- 晨光：完成愈多段，光愈亮 ---------- */
   function updateCandleGlow(doneCount){
     var holder = document.getElementById('candleHolder');
-    var glow = 8 + doneCount * 10; // 8..28
+    var glow = 6 + doneCount * 5; // 6..51
     holder.style.setProperty('--glow', glow + 'px');
   }
   function updateProgressDots(){
@@ -416,20 +399,6 @@
     dots.forEach(function(d, i){
       d.classList.toggle('done', i < currentLine);
     });
-  }
-
-  /* ---------- 依字數動態調整掉落區高度，避免段落較長時字卡被裁切 ---------- */
-  function computeZoneHeight(count){
-    var cs = getComputedStyle(document.documentElement);
-    var charSize = parseFloat(cs.getPropertyValue('--char-size')) || 24;
-    var dropSize = charSize + 26;
-    var gap = 8;
-    var zone = document.getElementById('dropZone');
-    var containerWidth = zone.clientWidth * 0.94 || 360;
-    var perRow = Math.max(1, Math.floor((containerWidth + gap) / (dropSize + gap)));
-    var rows = Math.ceil(count / perRow);
-    var h = rows * (dropSize + gap) + 30;
-    return Math.max(120, h);
   }
 
   /* ---------- 載入一段：只顯示這一段的空格 ---------- */
@@ -455,6 +424,20 @@
 
     var shuffled = line.chars.slice().sort(function(){ return Math.random() - 0.5; });
     spawnCluster(shuffled);
+  }
+
+  /* ---------- 依字數動態調整掉落區高度，避免段落較長時字卡被裁切 ---------- */
+  function computeZoneHeight(count){
+    var cs = getComputedStyle(document.documentElement);
+    var charSize = parseFloat(cs.getPropertyValue('--char-size')) || 24;
+    var dropSize = charSize + 26;
+    var gap = 8;
+    var zone = document.getElementById('dropZone');
+    var containerWidth = zone.clientWidth * 0.94 || 360;
+    var perRow = Math.max(1, Math.floor((containerWidth + gap) / (dropSize + gap)));
+    var rows = Math.ceil(count / perRow);
+    var h = rows * (dropSize + gap) + 30;
+    return Math.max(120, h);
   }
 
   /* ---------- 產生浮現的字卡（單一段） ---------- */
@@ -653,7 +636,7 @@
         particleCount: 140,
         spread: 90,
         origin: { y: 0.55 },
-        colors: ['#ffe9ae','#fff6c8','#ffd88a','#c9862a']
+        colors: ['#ffd9a0','#fff6c8','#e0965a','#c8d4ff']
       });
     }
 
@@ -671,8 +654,7 @@
   }
 
   /* ---------- 初始化 ---------- */
-  buildAmbientLight();
-  buildPillars();
+  buildAmbientBirds();
   buildPreview();
 })();
 </script>
