@@ -16,7 +16,7 @@
     --ink-soft:rgba(58,36,64,0.78);
     --accent:#5c3c68;
     --seal-gold:#d9a03a;
-    --glass-bg:rgba(252,247,253,0.34);
+    --glass-bg:rgba(255,235,238,0.6);
     --char-size:24px;
     --caption-size:16px;
   }
@@ -114,15 +114,23 @@
   @keyframes glow{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.2); } }
 
 
-  .window-frame{ background:linear-gradient(160deg,#e2c8e6,#a984ae); border:3px solid #c8a4cc;
+  .window-frame{ position:relative; background:#f7dce0; border:3px solid #5c2430;
     border-radius:10px; padding:8px; width:100%; max-width:390px; box-shadow:0 6px 18px rgba(58,36,64,0.28); }
   .glass{ position:relative; background:var(--glass-bg); border-radius:6px; padding:14px 8px;
     min-height:70px; display:flex; align-items:center; justify-content:center; overflow:hidden;
     box-shadow:inset 0 0 24px rgba(58,36,64,0.18); }
-    .glass.ripple::after{ content:''; position:absolute; inset:0; border-radius:6px;
+    .glass.ripple::after{ content:none; position:absolute; inset:0; border-radius:6px;
     background:radial-gradient(circle, rgba(255,252,240,0.6), transparent 65%);
     animation:rippleAnim .55s ease-out; }
   @keyframes rippleAnim{ 0%{ opacity:0; transform:scale(.6);} 40%{ opacity:.5;} 100%{ opacity:0; transform:scale(1.3);} }
+
+  .hint-banner{ position:absolute; inset:6px; border-radius:6px; background:rgba(255,248,230,0.98);
+    display:flex; align-items:center; justify-content:center; padding:10px 14px; z-index:6;
+    box-shadow:0 4px 16px rgba(0,0,0,0.28); border:2.5px solid #f0a400; }
+  .hint-banner p{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:calc(var(--char-size) - 6px);
+    line-height:1.75; color:#3a2010; text-align:center; margin:0; font-weight:bold; }
+  .hint-banner.show{ animation:hintBannerIn .25s ease-out; }
+  @keyframes hintBannerIn{ from{ opacity:0; transform:scale(.92); } to{ opacity:1; transform:scale(1); } }
 
   .slots-row{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; align-items:center; }
   .slot{ width:calc(var(--char-size) + 16px); height:calc(var(--char-size) + 16px);
@@ -131,8 +139,8 @@
     font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.82); }
   .slot.filled{ border-style:solid; border-width:2.5px; border-color:#d9a03a; color:var(--ink);
     text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(217,160,58,0.35) inset; }
-  .slot.hint-target{ animation:hintPulse 1.2s ease-in-out infinite; }
-  @keyframes hintPulse{ 0%,100%{ box-shadow:0 0 0 rgba(217,160,58,0.6);} 50%{ box-shadow:0 0 14px rgba(217,160,58,0.9);} }
+  .slot.hint-target{ animation:slotHintPulse 0.9s ease-in-out infinite; border-color:#f0a400 !important; border-style:solid !important; background:rgba(255,220,120,0.55) !important; }
+  @keyframes slotHintPulse{ 0%,100%{ box-shadow:0 0 4px 2px rgba(240,164,0,0.55);} 50%{ box-shadow:0 0 20px 6px rgba(240,164,0,0.95);} }
   .punct{ font-size:calc(var(--char-size) - 4px); color:var(--ink-soft); margin:0 1px; align-self:flex-end; }
 
   .drop-zone{ width:100%; max-width:390px; height:120px; position:relative; margin-top:6px;
@@ -141,15 +149,16 @@
   .char-cluster{ position:absolute; left:50%; top:-70px; transform:translateX(-50%); display:flex; gap:8px;
     flex-wrap:wrap; justify-content:center; width:94%; transition:top .05s linear; }
   .char-drop{ width:calc(var(--char-size) + 26px); height:calc(var(--char-size) + 26px); border-radius:50%;
-    background:radial-gradient(circle at 32% 28%, #3a2440, #1c1220 78%); color:#f6eef8;
+    background:#f3d9db; color:#4a1620;
     display:flex; align-items:center; justify-content:center; font-size:var(--char-size); font-weight:bold;
-    cursor:pointer; user-select:none; box-shadow:0 4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(217,160,58,0.4);
-    font-family:"KaiTi","STKaiti","BiauKai",serif; flex-shrink:0; text-shadow:0 1px 2px rgba(0,0,0,0.4);
-    border:1.5px solid rgba(230,205,235,0.4);
+    cursor:pointer; user-select:none; box-shadow:0 2px 5px rgba(0,0,0,0.18);
+    font-family:"KaiTi","STKaiti","BiauKai",serif; flex-shrink:0; text-shadow:none;
+    border:2.5px solid #5c2430;
     animation:bob 2.4s ease-in-out infinite; transition:transform .18s ease; }
   .char-drop:active{ transform:scale(0.9); }
   @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(-2deg); } 50%{ transform:translateY(-5px) rotate(2deg); } }
-  .char-drop.hint-glow{ animation:hintPulse 0.5s ease-in-out 2; box-shadow:0 0 18px var(--gold); }
+  .char-drop.hint-glow{ animation:dropHintPulse 0.5s ease-in-out 3; border-color:#f0a400 !important; }
+  @keyframes dropHintPulse{ 0%,100%{ box-shadow:0 0 6px 2px rgba(240,164,0,0.6); transform:scale(1);} 50%{ box-shadow:0 0 26px 8px rgba(240,164,0,0.95); transform:scale(1.15);} }
   .char-drop.wrong-shake{ animation:shake .35s; }
   @keyframes shake{ 20%,60%{ transform:translateX(-4px);} 40%,80%{ transform:translateX(4px);} }
   .char-drop.pop{ animation:popAway .28s ease forwards !important; }
@@ -221,6 +230,7 @@
       <div class="glass" id="glass">
         <div id="slots" class="slots-row"></div>
       </div>
+      <div class="hint-banner" id="hintBanner" hidden></div>
     </div>
   </div>
   <div id="dropZone" class="drop-zone"></div>
@@ -549,20 +559,18 @@
     });
   }
 
+  var hintTimer = null;
   window.giveHint = function(){
-    var targetSlot = document.querySelector('#slots .slot:not(.filled)');
-    if (!targetSlot) return;
-    targetSlot.classList.add('hint-target');
-    setTimeout(function(){ targetSlot.classList.remove('hint-target'); }, 2400);
-
-    var ch = targetSlot.dataset.char;
-    var drops = document.querySelectorAll('.char-drop');
-    drops.forEach(function(d){
-      if (d.textContent === ch){
-        d.classList.add('hint-glow');
-        setTimeout(function(){ d.classList.remove('hint-glow'); }, 1200);
-      }
-    });
+    var banner = document.getElementById('hintBanner');
+    if (hintTimer) clearTimeout(hintTimer);
+    banner.innerHTML = '<p>' + fullVerseSpeech + '</p>';
+    banner.hidden = false;
+    banner.classList.remove('show'); void banner.offsetWidth; banner.classList.add('show');
+    hintTimer = setTimeout(function(){
+      banner.hidden = true;
+      banner.classList.remove('show');
+      hintTimer = null;
+    }, 10000);
   };
 
   function speak(text, onDone){
