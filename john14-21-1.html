@@ -20,6 +20,7 @@
         .action-container { margin: 8px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .yt-link { text-decoration: none; padding: 6px 12px; background: #FF0000; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; }
         .preview-btn { padding: 6px 12px; background: #5c6bc0; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .listen-btn { padding: 6px 12px; background: #0ea5e9; color: white; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
         
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 10px 0; align-items: center; }
         .slot { width: 30px; height: 30px; border: 2px dashed #8b4513; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 6px; font-weight: bold; font-size: 15px; color: #333; }
@@ -81,9 +82,10 @@
     <div class="action-container">
         <a href="https://www.youtube.com/shorts/_AVoM_edTvQ" target="_blank" class="yt-link">🎥 觀看複習影片</a>
         <button class="preview-btn" onclick="showPreview()">📖 觀看神的話</button>
+        <button class="listen-btn" onclick="listenVerse()">🔊 聽聲音</button>
     </div>
 
-    <div class="instruction">點選下方框框裡的字，正確的字會出現在上方的空格中</div>
+    <div class="instruction">請點擊下方掉落下來的字，填入上方空格中</div>
 
     <div id="slots" class="grid-container"></div>
     
@@ -170,6 +172,23 @@
                 }
             });
         }, 5000); 
+    }
+
+
+    function listenVerse() {
+        if (!('speechSynthesis' in window)) return;
+        try {
+            window.speechSynthesis.cancel();
+            setTimeout(() => {
+                try {
+                    const verseOnly = fullText.replace(/[\(（].*?[\)）]\s*$/, '');
+                    const msg = new SpeechSynthesisUtterance(verseOnly);
+                    msg.lang = 'zh-TW';
+                    msg.rate = 0.82;
+                    window.speechSynthesis.speak(msg);
+                } catch (e) {}
+            }, 80);
+        } catch (e) {}
     }
 
     function startTimerIfNeeded() {
