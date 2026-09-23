@@ -141,6 +141,7 @@
   .slot.filled{ border-style:solid; border-width:2.5px; border-color:#d9708c; color:var(--ink);
     text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(217,112,140,0.35) inset; }
   .slot.hint-target{ animation:slotHintPulse 0.9s ease-in-out infinite; border-color:#f0a400 !important; border-style:solid !important; background:rgba(255,220,120,0.55) !important; }
+  .slot.locked, .punct.locked{ opacity:.72; }
   @keyframes slotHintPulse{ 0%,100%{ box-shadow:0 0 4px 2px rgba(240,164,0,0.55);} 50%{ box-shadow:0 0 20px 6px rgba(240,164,0,0.95);} }
   .punct{ font-size:calc(var(--char-size) - 4px); color:var(--ink-soft); margin:0 1px; align-self:flex-end; }
 
@@ -165,9 +166,9 @@
   .char-drop.pop{ animation:popAway .28s ease forwards !important; }
   @keyframes popAway{ 0%{ transform:scale(1); opacity:1; } 60%{ transform:scale(1.35); opacity:1; } 100%{ transform:scale(0.2); opacity:0; } }
 
-  .controls-row{ display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
-  .ctrl-btn{ padding:17px 24px; border:2px solid rgba(28,60,28,0.75); border-radius:24px;
-    background:rgba(255,255,255,0.92); color:var(--ink); font-size:20px; font-weight:bold; cursor:pointer;
+  .controls-row{ display:flex; gap:9px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
+  .ctrl-btn{ padding:12px 17px; border:2px solid rgba(28,60,28,0.75); border-radius:18px;
+    background:rgba(255,255,255,0.92); color:var(--ink); font-size:16px; font-weight:bold; cursor:pointer;
     box-shadow:0 2px 8px rgba(0,0,0,0.2); }
   .ctrl-btn.home-btn{ background:linear-gradient(180deg,#d6e6f0,#8fb4cc); border-color:rgba(16,40,56,0.55); color:#14303c; }
 
@@ -367,6 +368,7 @@
     buildProgressDots();
     updateGlow(0);
     updateProgressDots();
+    document.getElementById('slots').innerHTML = '';
     loadLine(0);
   };
   window.goHome = function(){
@@ -403,17 +405,21 @@
   function loadLine(idx){
     var line = lines[idx];
     var slotsDiv = document.getElementById('slots');
-    slotsDiv.innerHTML = '';
+    Array.prototype.forEach.call(slotsDiv.children, function(el){
+      el.classList.add('locked');
+    });
     line.chars.forEach(function(ch){
       var slot = document.createElement('div');
       slot.className = 'slot';
       slot.dataset.char = ch;
+      slot.dataset.line = String(idx);
       slotsDiv.appendChild(slot);
     });
     if (line.punct){
       var punct = document.createElement('span');
       punct.className = 'punct';
       punct.textContent = line.punct;
+      punct.dataset.line = String(idx);
       slotsDiv.appendChild(punct);
     }
 
@@ -529,7 +535,7 @@
   }
 
   window.undoLast = function(){
-    var filled = document.querySelectorAll('#slots .slot.filled');
+    var filled = document.querySelectorAll('#slots .slot.filled[data-line="' + currentLine + '"]');
     if (filled.length === 0) return;
     var lastSlot = filled[filled.length - 1];
     var ch = lastSlot.dataset.char;
