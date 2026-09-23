@@ -143,8 +143,8 @@
     text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(217,112,140,0.35) inset; }
   .slot.hint-target{ animation:slotHintPulse 0.9s ease-in-out infinite; border-color:#f0a400 !important; border-style:solid !important; background:rgba(255,220,120,0.55) !important; }
   .slot.locked{ width:calc(var(--caption-size) + 6px); height:calc(var(--caption-size) + 6px);
-    font-size:calc(var(--caption-size) - 2px); border-width:1.2px; opacity:.68; }
-  .punct.locked{ font-size:calc(var(--caption-size) - 4px); opacity:.68; transition:font-size .25s ease, opacity .25s ease; }
+    font-size:calc(var(--caption-size) - 2px); border-width:1.2px; color:var(--ink); text-shadow:none; }
+  .punct.locked{ font-size:calc(var(--caption-size) - 4px); color:var(--ink-soft); transition:font-size .25s ease; }
   @keyframes slotHintPulse{ 0%,100%{ box-shadow:0 0 4px 2px rgba(240,164,0,0.55);} 50%{ box-shadow:0 0 20px 6px rgba(240,164,0,0.95);} }
   .punct{ font-size:calc(var(--char-size) - 4px); color:var(--ink-soft); margin:0 1px; align-self:flex-end; }
 

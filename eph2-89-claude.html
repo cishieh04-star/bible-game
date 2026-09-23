@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>顯明大愛</title>
+<title>恩典之禮</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
 
   :root{
-    --sky-top:#fff2f0;
-    --sky-mid:#ffd4cc;
-    --sky-bottom:#f0a89c;
-    --gold:#e05840;
-    --ink:#7a2418;
-    --ink-soft:rgba(122,36,24,0.78);
-    --accent:#a83c2a;
-    --seal-gold:#d9483a;
+    --sky-top:#f8f0ff;
+    --sky-mid:#e2c9f5;
+    --sky-bottom:#c7a0e0;
+    --gold:#c9962a;
+    --ink:#4a2a5c;
+    --ink-soft:rgba(74,42,92,0.78);
+    --accent:#6a3d82;
+    --seal-gold:#c9962a;
     --glass-bg:rgba(255,235,238,0.6);
     --char-size:24px;
     --caption-size:16px;
@@ -34,7 +34,7 @@
     transition:background 1.2s ease;
   }
   body.dawn{
-    background:linear-gradient(to bottom, #fff8f5 0%, #ffdcd0 45%, #ffb0a0 100%);
+    background:linear-gradient(to bottom, #fdf8ff 0%, #ecd8fa 45%, #dcb8ee 100%);
   }
   body.dawn .sil-back{ opacity:.5; }
   body.dawn .sil-front{ opacity:.65; }
@@ -46,8 +46,8 @@
   .ambient-wrap{ position:absolute; inset:0; }
   .ambient-drop{
     position:absolute; bottom:-5%; width:4px; height:4px; border-radius:50%;
-    background:radial-gradient(circle, #ffffff, #ffcabc 70%);
-    box-shadow:0 0 5px rgba(250,190,170,0.9);
+    background:radial-gradient(circle, #ffffff, #e8c8fa 70%);
+    box-shadow:0 0 5px rgba(230,200,250,0.9);
     animation-name:motesRise; animation-timing-function:ease-in-out; animation-iteration-count:infinite;
   }
   @keyframes motesRise{
@@ -57,24 +57,24 @@
     100%{ bottom:100%; opacity:0; transform:translateX(var(--drift,20px)); }
   }
   .sil{ position:absolute; bottom:0; left:0; width:100%; transition:background 1.2s ease, opacity 1.2s ease; }
-  .sil-back{ height:106px; background:#c47060; opacity:.5;
-    clip-path:polygon(0 100%,0 76%,10% 60%,20% 74%,30% 54%,40% 72%,50% 52%,60% 72%,70% 54%,80% 74%,90% 58%,100% 72%,100% 100%); }
-  .sil-front{ height:62px; background:#a04c38;
-    clip-path:polygon(0 100%,0 82%,12% 68%,24% 84%,36% 64%,48% 84%,60% 64%,72% 84%,84% 66%,96% 84%,100% 76%,100% 100%); }
+  .sil-back{ height:108px; background:#a06cc0; opacity:.5;
+    clip-path:polygon(0 100%,0 78%,10% 60%,16% 78%,26% 58%,32% 78%,42% 56%,48% 78%,58% 58%,64% 78%,74% 56%,80% 78%,90% 60%,96% 78%,100% 70%,100% 100%); }
+  .sil-front{ height:60px; background:#7a4a9c;
+    clip-path:polygon(0 100%,0 84%,9% 70%,15% 84%,25% 68%,31% 84%,41% 66%,47% 84%,57% 68%,63% 84%,73% 66%,79% 84%,89% 70%,95% 84%,100% 78%,100% 100%); }
 
   .page{ position:relative; z-index:2; width:100%; max-width:480px; }
 
   #timer{ position:fixed; top:10px; left:12px; font-size:13px; color:var(--ink);
-    background:rgba(255,255,255,0.5); padding:4px 10px; border-radius:10px; border:1px solid rgba(122,36,24,0.3); z-index:1000; }
+    background:rgba(255,255,255,0.5); padding:4px 10px; border-radius:10px; border:1px solid rgba(74,42,92,0.3); z-index:1000; }
   .font-controls{ position:fixed; top:10px; right:12px; z-index:1000; display:flex; gap:6px; }
-  .font-controls button{ width:48px; height:48px; border-radius:13px; border:2px solid rgba(122,36,24,0.75);
+  .font-controls button{ width:48px; height:48px; border-radius:13px; border:2px solid rgba(74,42,92,0.75);
     background:rgba(255,255,255,0.95); color:var(--ink); font-size:19px; font-weight:bold; cursor:pointer;
     box-shadow:0 2px 6px rgba(0,0,0,0.2); }
 
   #home{ text-align:center; padding-top:7vh; min-height:88vh; display:flex; flex-direction:column; align-items:center; }
   .eyebrow{ font-size:13px; letter-spacing:2px; color:var(--ink-soft); margin:0 0 6px; }
-  .poem-title{ font-size:25px; margin:0; letter-spacing:3px; color:#c1341a;
-    font-family:"KaiTi","STKaiti","BiauKai",serif; text-shadow:0 0 18px rgba(224,88,64,0.45); }
+  .poem-title{ font-size:25px; margin:0; letter-spacing:3px; color:#7a3fa0;
+    font-family:"KaiTi","STKaiti","BiauKai",serif; text-shadow:0 0 18px rgba(201,150,42,0.45); }
   .poet-line{ margin:6px 0 22px; font-size:14px; color:var(--ink-soft); }
   .preview-line{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:22px; letter-spacing:2px;
     color:var(--ink); min-height:34px; margin-bottom:26px; line-height:1.7; padding:0 14px; }
@@ -82,44 +82,44 @@
   @keyframes charFadeIn{ to{ opacity:1; } }
 
   .candle-btn{ font-size:17px; font-weight:bold; padding:14px 28px; border:none; border-radius:30px;
-    background:linear-gradient(180deg,#ffb8a8,#e05840); color:#3a1006; cursor:pointer;
-    box-shadow:0 0 22px rgba(224,88,64,0.5); margin-bottom:14px; }
-  .ghost-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(122,36,24,0.75); color:var(--ink);
+    background:linear-gradient(180deg,#e8c8fa,#a066cc); color:#2c1440; cursor:pointer;
+    box-shadow:0 0 22px rgba(201,150,42,0.5); margin-bottom:14px; }
+  .ghost-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(74,42,92,0.75); color:var(--ink);
     padding:14px 26px; border-radius:24px; font-size:19px; font-weight:bold; cursor:pointer;
     box-shadow:0 2px 6px rgba(0,0,0,0.15); }
   .full-panel{ margin-top:16px; width:92%; max-width:420px; background:rgba(255,255,255,0.42);
-    border:1px solid rgba(122,36,24,0.3); border-radius:12px; padding:14px 16px; text-align:left; }
+    border:1px solid rgba(74,42,92,0.3); border-radius:12px; padding:14px 16px; text-align:left; }
   .full-text{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:17px; line-height:1.9; color:var(--ink); }
   .full-trans{ margin-top:10px; font-size:13px; line-height:1.7; color:var(--ink-soft); }
 
   #game{ display:flex; flex-direction:column; align-items:center; padding-top:2vh; }
   .progress-dots{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; max-width:280px; }
-  .progress-dots span{ width:9px; height:9px; border-radius:50%; background:rgba(122,36,24,0.2);
-    border:1px solid rgba(122,36,24,0.4); transition:background .4s; }
-  .progress-dots span.done{ background:#d9483a; box-shadow:0 0 8px rgba(217,72,58,0.7); }
+  .progress-dots span{ width:9px; height:9px; border-radius:50%; background:rgba(74,42,92,0.2);
+    border:1px solid rgba(74,42,92,0.4); transition:background .4s; }
+  .progress-dots span.done{ background:#c9962a; box-shadow:0 0 8px rgba(201,150,42,0.7); }
 
-  .window-scene{ position:relative; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; }
+  .window-scene{ position:relative; display:flex; align-items:flex-end; justify-content:center; gap:6px; width:100%; }
   .window-scene::before{ content:''; position:absolute; top:10%; left:50%; width:240px; height:240px;
     transform:translate(-50%,-30%); border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle, rgba(224,88,64,0.35), transparent 70%); z-index:-1; }
+    background:radial-gradient(circle, rgba(201,150,42,0.35), transparent 70%); z-index:-1; }
   
-  .light-holder{ position:relative; width:40px; height:60px; margin-top:16px; flex-shrink:0;
-    filter:drop-shadow(0 0 var(--glow,8px) #ff9c88); transition:filter .6s; display:flex; align-items:center; justify-content:center; }
-  .light-holder .heart{ width:28px; height:26px; position:relative;
-    background:radial-gradient(circle at 35% 30%, #fff2e8, #ffa088 55%, #e05840 92%);
-    transform:rotate(-45deg); animation:beat 1.7s ease-in-out infinite; }
-  .light-holder .heart::before, .light-holder .heart::after{ content:''; position:absolute; width:28px; height:28px;
-    border-radius:50%; background:inherit; }
-  .light-holder .heart::before{ top:-14px; left:0; }
-  .light-holder .heart::after{ top:0; left:14px; }
-  @keyframes beat{ 0%,100%{ transform:rotate(-45deg) scale(1); } 50%{ transform:rotate(-45deg) scale(1.18); } }
+  .light-holder{ position:relative; width:38px; height:70px; margin-bottom:14px; flex-shrink:0;
+    filter:drop-shadow(0 0 var(--glow,8px) #d9a8f5); transition:filter .6s; display:flex; align-items:flex-end; justify-content:center; }
+  .light-holder .box{ position:absolute; bottom:0; width:34px; height:26px; left:50%; transform:translateX(-50%);
+    background:linear-gradient(160deg,#c9962a,#8a6318); border-radius:3px; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+  .light-holder .box::before{ content:''; position:absolute; left:50%; top:0; bottom:0; width:6px; transform:translateX(-50%);
+    background:#7a4a9c; }
+  .light-holder .orb{ width:24px; height:24px; border-radius:50%; margin-bottom:22px;
+    background:radial-gradient(circle at 35% 30%, #fff6e0, #e8c8fa 55%, #a066cc 92%);
+    animation:glow 2.2s ease-in-out infinite; }
+  @keyframes glow{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.15); } }
 
 
   .window-frame{ position:relative; background:#f7dce0; border:3px solid #5c2430;
     border-radius:10px; padding:8px; width:100%; max-width:390px; box-shadow:0 6px 18px rgba(0,0,0,0.22); }
   .glass{ position:relative; background:var(--glass-bg); border-radius:6px; padding:14px 8px;
     min-height:70px; display:flex; align-items:center; justify-content:center; overflow:hidden;
-    box-shadow:inset 0 0 24px rgba(122,36,24,0.18); }
+    box-shadow:inset 0 0 24px rgba(74,42,92,0.18); }
     .glass.ripple::after{ content:none; position:absolute; inset:0; border-radius:6px;
     background:radial-gradient(circle, rgba(255,252,240,0.6), transparent 65%);
     animation:rippleAnim .55s ease-out; }
@@ -135,11 +135,11 @@
 
   .slots-row{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; align-items:center; }
   .slot{ width:calc(var(--char-size) + 16px); height:calc(var(--char-size) + 16px);
-    border:2.5px dashed rgba(122,36,24,0.85); border-radius:8px; display:flex; align-items:center;
+    border:2.5px dashed rgba(74,42,92,0.85); border-radius:8px; display:flex; align-items:center;
     justify-content:center; font-size:var(--char-size); font-weight:bold; color:var(--ink);
     font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.82); }
-  .slot.filled{ border-style:solid; border-width:2.5px; border-color:#d9483a; color:var(--ink);
-    text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(217,72,58,0.35) inset; }
+  .slot.filled{ border-style:solid; border-width:2.5px; border-color:#c9962a; color:var(--ink);
+    text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(201,150,42,0.35) inset; }
   .slot.hint-target{ animation:slotHintPulse 0.9s ease-in-out infinite;
     border-color:#f0a400 !important; border-style:solid !important; background:rgba(255,220,120,0.55) !important; }
   @keyframes slotHintPulse{ 0%,100%{ box-shadow:0 0 4px 2px rgba(240,164,0,0.55);} 50%{ box-shadow:0 0 20px 6px rgba(240,164,0,0.95);} }
@@ -172,7 +172,7 @@
   @keyframes popAway{ 0%{ transform:scale(1); opacity:1; } 60%{ transform:scale(1.35); opacity:1; } 100%{ transform:scale(0.2); opacity:0; } }
 
   .controls-row{ display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
-  .ctrl-btn{ padding:17px 24px; border:2px solid rgba(122,36,24,0.75); border-radius:24px;
+  .ctrl-btn{ padding:17px 24px; border:2px solid rgba(74,42,92,0.75); border-radius:24px;
     background:rgba(255,255,255,0.92); color:var(--ink); font-size:20px; font-weight:bold; cursor:pointer;
     box-shadow:0 2px 8px rgba(0,0,0,0.2); }
   .ctrl-btn.home-btn{ background:linear-gradient(180deg,#d6e6f0,#8fb4cc); border-color:rgba(16,40,56,0.55); color:#14303c; }
@@ -180,24 +180,24 @@
   .ctrl-btn{ padding:12px 17px; border-radius:18px; font-size:16px; }
 
   #finish{ text-align:center; padding-top:6vh; display:flex; flex-direction:column; align-items:center; }
-  .seal{ width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffd8cc, var(--seal-gold) 75%);
-    color:#3a1006; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold;
+  .seal{ width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #f5e4ff, var(--seal-gold) 75%);
+    color:#2c1440; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold;
     font-family:"KaiTi","STKaiti","BiauKai",serif; letter-spacing:1px;
-    box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 4px 14px rgba(217,72,58,0.4); transform:scale(0);
+    box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 4px 14px rgba(201,150,42,0.4); transform:scale(0);
     animation:stampIn .5s cubic-bezier(.34,1.56,.64,1) forwards; margin-bottom:10px; }
   @keyframes stampIn{ to{ transform:scale(1); } }
-  #finish h2{ margin:2px 0 12px; font-size:18px; color:#c1341a; }
+  #finish h2{ margin:2px 0 12px; font-size:18px; color:#7a3fa0; }
   .final-poem{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:18px; line-height:1.9; letter-spacing:1px;
     color:var(--ink); text-shadow:none; margin-bottom:8px; padding:0 6px; }
   .final-time{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
   .home-btn-row{ display:flex; gap:10px; margin-top:16px; width:92%; max-width:380px; }
   .home-btn-row button{ flex:1; padding:11px 6px; border:none; border-radius:8px; font-size:14px; font-weight:bold;
-    cursor:pointer; color:#3a1006; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
-  .start-btn{ background:linear-gradient(180deg,#ffb8a8,#d9483a); }
-  .translate-btn2{ background:linear-gradient(180deg,#ffb8a8,#e05840); }
+    cursor:pointer; color:#2c1440; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+  .start-btn{ background:linear-gradient(180deg,#e0bcf2,#8a4cb0); }
+  .translate-btn2{ background:linear-gradient(180deg,#e8c8fa,#a066cc); }
   #toggleTransBtn{ margin-top:22px; }
 
-  .mute-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(122,36,24,0.6); color:var(--ink);
+  .mute-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(74,42,92,0.6); color:var(--ink);
     padding:12px 22px; border-radius:20px; font-size:17px; font-weight:bold; cursor:pointer; margin-top:6px; }
 
   [hidden]{ display:none !important; }
@@ -219,22 +219,22 @@
 </div>
 
 <div id="home" class="page">
-  <p class="eyebrow">聖經記憶遊戲 · 神的愛向我們顯明</p>
-  <h1 class="poem-title">羅馬書 5:8</h1>
+  <p class="eyebrow">聖經記憶遊戲 · 白白得來的恩典</p>
+  <h1 class="poem-title">以弗所書 2:8-9</h1>
   <p class="poet-line">新約 · 保羅的教導</p>
   <div class="preview-line" id="previewLine"></div>
-  <button class="candle-btn" onclick="enterGame()">❤️ 經歷大愛，開始拼經文</button>
+  <button class="candle-btn" onclick="enterGame()">🎁 領受恩典，開始拼經文</button>
   <button class="ghost-btn" onclick="toggleFull()">閱讀全文</button>
   <div id="fullPanel" class="full-panel" hidden>
-    <div class="full-text">「唯有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。」</div>
-    <div class="full-trans">羅馬書 5:8</div>
+    <div class="full-text">「你們得救是本乎恩，也因著信；這並不是出於自己，乃是神所賜的，也不是出於行為，免得有人自誇。」</div>
+    <div class="full-trans">以弗所書 2:8-9</div>
   </div>
 </div>
 
 <div id="game" class="page" hidden>
   <div class="progress-dots" id="progressDots"></div>
   <div class="window-scene">
-    <div class="light-holder" id="candleHolder"><div class="heart"></div></div>
+    <div class="light-holder" id="candleHolder"><div class="orb"></div><div class="box"></div></div>
     <div class="window-frame">
       <div class="glass" id="glass">
         <div id="slots" class="slots-row"></div>
@@ -252,9 +252,9 @@
 </div>
 
 <div id="finish" class="page" hidden>
-  <div class="seal">大愛</div>
-  <h2>經文拼寫完成，願你天天經歷這愛</h2>
-  <div class="final-poem">「唯有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。」</div>
+  <div class="seal">恩典</div>
+  <h2>經文拼寫完成，恩典白白賜下</h2>
+  <div class="final-poem">「你們得救是本乎恩，也因著信；這並不是出於自己，乃是神所賜的，也不是出於行為，免得有人自誇。」</div>
   <p class="final-time" id="finalTime"></p>
 
   <div class="home-btn-row">
@@ -266,7 +266,7 @@
   <br>
   <button class="mute-btn" onclick="stopNarration()">🔇 不想聽語音了</button>
   <div id="finalTransPanel" class="full-panel" hidden>
-    <div class="full-trans">願你天天記得，神的愛不是等你變好才給你，而是在你還軟弱的時候就已經顯明。<br>願這樣的愛，天天安慰你的心。</div>
+    <div class="full-trans">願你天天記得，救恩是神白白賜下的禮物，不是靠自己的努力換來的。<br>願你在這樣的恩典中，心裡謙卑又滿有平安。</div>
   </div>
 </div>
 
@@ -276,15 +276,16 @@
   "use strict";
 
   var lines = [
-    { chars:["唯","有","基","督"], punct:"" },
-      { chars:["在","我","們","還","作"], punct:"" },
-      { chars:["罪","人","的","時","候"], punct:"" },
-      { chars:["為","我","們","死"], punct:"，" },
-    { chars:["神","的","愛","就","在","此","向","我","們","顯","明","了"], punct:"。" }
+    { chars:["你","們","得","救","是","本","乎","恩"], punct:"，" },
+    { chars:["也","因","著","信"], punct:"；" },
+    { chars:["這","並","不","是","出","於","自","己"], punct:"，" },
+    { chars:["乃","是","神","所","賜","的"], punct:"，" },
+    { chars:["也","不","是","出","於","行","為"], punct:"，" },
+    { chars:["免","得","有","人","自","誇"], punct:"。" }
   ];
 
-  var fullVerseSpeech = "唯有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。";
-  var blessingSpeech = "願你天天記得，神的愛不是等你變好才給你，而是在你還軟弱的時候就已經顯明。願這樣的愛，天天安慰你的心。";
+  var fullVerseSpeech = "你們得救是本乎恩，也因著信；這並不是出於自己，乃是神所賜的，也不是出於行為，免得有人自誇。";
+  var blessingSpeech = "願你天天記得，救恩是神白白賜下的禮物，不是靠自己的努力換來的。願你在這樣的恩典中，心裡謙卑又滿有平安。";
 
   function styleDrop(el){
     el.style.animationDelay = (-Math.random() * 2.4).toFixed(2) + 's';
@@ -400,7 +401,7 @@
 
   function updateGlow(doneCount){
     var holder = document.getElementById('candleHolder');
-    var glow = 8 + doneCount * 7;
+    var glow = 8 + doneCount * 6;
     holder.style.setProperty('--glow', glow + 'px');
   }
   function updateProgressDots(){
@@ -646,7 +647,7 @@
         particleCount: 140,
         spread: 90,
         origin: { y: 0.55 },
-        colors: ["#ffb8a8","#fff6c8","#ffd8cc","#d9483a"]
+        colors: ["#e0bcf2","#fff6c8","#c9962a","#8a4cb0"]
       });
     }
 

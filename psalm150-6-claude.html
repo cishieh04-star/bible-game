@@ -63,6 +63,8 @@
         .progress-label { font-size: 11px; color: #7a3494; margin-top: 3px; }
 
         .grid-container { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 14px 0; align-items: center; }
+        .slot.locked { width: 20px; height: 20px; font-size: 12px; transition: all 0.25s; }
+        .punctuation.locked { font-size: 12px; }
         .slot {
             width: 30px; height: 30px; border: 2px dashed #c48fdd; display: flex; align-items: center;
             justify-content: center; background-color: #fffcff; border-radius: 7px; font-weight: bold;
@@ -99,6 +101,7 @@
             transition: transform 0.12s;
         }
         .tetris-word:active { transform: scale(0.88); }
+        .tetris-word { width: 56px; height: 56px; font-size: 22px; }
         @keyframes itemGlow {
             0%, 100% { box-shadow: 0 0 9px rgba(205,124,235,0.55), 0 4px 6px rgba(0,0,0,0.2); }
             50% { box-shadow: 0 0 18px rgba(205,124,235,0.9), 0 4px 8px rgba(0,0,0,0.25); }
@@ -435,12 +438,13 @@
         updateProgress();
 
         currentLineIdx = 0;
+        document.getElementById('slots').innerHTML = '';
         loadLine(currentLineIdx);
     }
 
     function loadLine(idx) {
         const slotsDiv = document.getElementById('slots');
-        slotsDiv.innerHTML = '';
+        Array.from(slotsDiv.children).forEach((el) => { el.classList.add('locked'); });
 
         const chars = lines[idx].split('');
         chars.forEach((char) => {
@@ -448,11 +452,13 @@
                 const punc = document.createElement('span');
                 punc.className = 'punctuation';
                 punc.textContent = char;
+                punc.dataset.line = String(idx);
                 slotsDiv.appendChild(punc);
             } else {
                 const slot = document.createElement('div');
                 slot.className = 'slot';
                 slot.dataset.char = char;
+                slot.dataset.line = String(idx);
                 slotsDiv.appendChild(slot);
             }
         });
@@ -465,6 +471,13 @@
         spawnNextBlock();
 
         setTimeout(() => enqueueSpeech(lines[idx]), 300);
+        scrollToActive();
+    }
+
+    function scrollToActive() {
+        const target = document.querySelector('.btn-group');
+        if (!target || !target.scrollIntoView) return;
+        setTimeout(() => { target.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, 90);
     }
 
     function updateProgress() {
@@ -559,7 +572,7 @@
     }
 
     function undoLast() {
-        const filled = document.querySelectorAll('#slots .slot.filled-slot');
+        const filled = document.querySelectorAll('#slots .slot.filled-slot[data-line="' + currentLineIdx + '"]');
         if (filled.length === 0) return;
         const lastSlot = filled[filled.length - 1];
         const charToReturn = lastSlot.dataset.char;

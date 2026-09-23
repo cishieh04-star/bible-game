@@ -3,19 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>顯明大愛</title>
+<title>天賜恩光</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
-
   :root{
-    --sky-top:#fff2f0;
-    --sky-mid:#ffd4cc;
-    --sky-bottom:#f0a89c;
-    --gold:#e05840;
-    --ink:#7a2418;
-    --ink-soft:rgba(122,36,24,0.78);
-    --accent:#a83c2a;
-    --seal-gold:#d9483a;
+    --sky-top:#fffaf0;
+    --sky-mid:#ffedbc;
+    --sky-bottom:#ffdd8f;
+    --gold:#e8ad3a;
+    --ink:#5a4315;
+    --ink-soft:rgba(90,67,21,0.78);
+    --cloud:#fff4d6;
+    --seal-gold:#d99a2a;
     --glass-bg:rgba(255,235,238,0.6);
     --char-size:24px;
     --caption-size:16px;
@@ -33,21 +32,23 @@
     padding:10px 12px 30px;
     transition:background 1.2s ease;
   }
+  /* 完成畫面：天光更加明亮，象徵恩典清楚顯明 */
   body.dawn{
-    background:linear-gradient(to bottom, #fff8f5 0%, #ffdcd0 45%, #ffb0a0 100%);
+    background:linear-gradient(to bottom, #fffdf5 0%, #fff1c4 45%, #ffe19c 100%);
   }
-  body.dawn .sil-back{ opacity:.5; }
-  body.dawn .sil-front{ opacity:.65; }
+  body.dawn .clouds-back{ opacity:.55; }
+  body.dawn .clouds-front{ opacity:.7; }
 
+  /* ---------- 天光場景背景 ---------- */
   .scene-bg{ position:fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
   .scene-bg::before{ content:''; position:absolute; top:-15%; left:50%; width:80%; padding-top:80%;
     transform:translateX(-50%); border-radius:50%;
-    background:radial-gradient(circle, rgba(255,255,255,0.55), transparent 68%); }
-  .ambient-wrap{ position:absolute; inset:0; }
+    background:radial-gradient(circle, rgba(255,255,255,0.6), transparent 68%); }
+  .ambient-light{ position:absolute; inset:0; }
   .ambient-drop{
     position:absolute; bottom:-5%; width:4px; height:4px; border-radius:50%;
-    background:radial-gradient(circle, #ffffff, #ffcabc 70%);
-    box-shadow:0 0 5px rgba(250,190,170,0.9);
+    background:radial-gradient(circle, #ffffff, #ffe9ae 70%);
+    box-shadow:0 0 5px rgba(255,220,150,0.9);
     animation-name:motesRise; animation-timing-function:ease-in-out; animation-iteration-count:infinite;
   }
   @keyframes motesRise{
@@ -56,25 +57,26 @@
     85%{ opacity:.55; }
     100%{ bottom:100%; opacity:0; transform:translateX(var(--drift,20px)); }
   }
-  .sil{ position:absolute; bottom:0; left:0; width:100%; transition:background 1.2s ease, opacity 1.2s ease; }
-  .sil-back{ height:106px; background:#c47060; opacity:.5;
-    clip-path:polygon(0 100%,0 76%,10% 60%,20% 74%,30% 54%,40% 72%,50% 52%,60% 72%,70% 54%,80% 74%,90% 58%,100% 72%,100% 100%); }
-  .sil-front{ height:62px; background:#a04c38;
-    clip-path:polygon(0 100%,0 82%,12% 68%,24% 84%,36% 64%,48% 84%,60% 64%,72% 84%,84% 66%,96% 84%,100% 76%,100% 100%); }
+  .clouds{ position:absolute; bottom:0; left:0; width:100%; transition:background 1.2s ease, opacity 1.2s ease; }
+  .clouds-back{ height:100px; background:#ffe6ae; opacity:.5;
+    clip-path:polygon(0 100%,0 82%,10% 68%,20% 80%,30% 62%,42% 78%,55% 60%,68% 78%,80% 64%,90% 80%,100% 70%,100% 100%); }
+  .clouds-front{ height:58px; background:#ffd98a;
+    clip-path:polygon(0 100%,0 86%,15% 72%,28% 88%,42% 70%,58% 88%,72% 72%,86% 88%,100% 76%,100% 100%); }
 
   .page{ position:relative; z-index:2; width:100%; max-width:480px; }
 
   #timer{ position:fixed; top:10px; left:12px; font-size:13px; color:var(--ink);
-    background:rgba(255,255,255,0.5); padding:4px 10px; border-radius:10px; border:1px solid rgba(122,36,24,0.3); z-index:1000; }
+    background:rgba(255,255,255,0.5); padding:4px 10px; border-radius:10px; border:1px solid rgba(90,67,21,0.3); z-index:1000; }
   .font-controls{ position:fixed; top:10px; right:12px; z-index:1000; display:flex; gap:6px; }
-  .font-controls button{ width:48px; height:48px; border-radius:13px; border:2px solid rgba(122,36,24,0.75);
+  .font-controls button{ width:48px; height:48px; border-radius:13px; border:2px solid rgba(90,67,21,0.75);
     background:rgba(255,255,255,0.95); color:var(--ink); font-size:19px; font-weight:bold; cursor:pointer;
     box-shadow:0 2px 6px rgba(0,0,0,0.2); }
 
+  /* ---------- 首頁 ---------- */
   #home{ text-align:center; padding-top:7vh; min-height:88vh; display:flex; flex-direction:column; align-items:center; }
   .eyebrow{ font-size:13px; letter-spacing:2px; color:var(--ink-soft); margin:0 0 6px; }
-  .poem-title{ font-size:25px; margin:0; letter-spacing:3px; color:#c1341a;
-    font-family:"KaiTi","STKaiti","BiauKai",serif; text-shadow:0 0 18px rgba(224,88,64,0.45); }
+  .poem-title{ font-size:25px; margin:0; letter-spacing:3px; color:#b5791a;
+    font-family:"KaiTi","STKaiti","BiauKai",serif; text-shadow:0 0 18px rgba(232,173,58,0.5); }
   .poet-line{ margin:6px 0 22px; font-size:14px; color:var(--ink-soft); }
   .preview-line{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:22px; letter-spacing:2px;
     color:var(--ink); min-height:34px; margin-bottom:26px; line-height:1.7; padding:0 14px; }
@@ -82,44 +84,51 @@
   @keyframes charFadeIn{ to{ opacity:1; } }
 
   .candle-btn{ font-size:17px; font-weight:bold; padding:14px 28px; border:none; border-radius:30px;
-    background:linear-gradient(180deg,#ffb8a8,#e05840); color:#3a1006; cursor:pointer;
-    box-shadow:0 0 22px rgba(224,88,64,0.5); margin-bottom:14px; }
-  .ghost-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(122,36,24,0.75); color:var(--ink);
+    background:linear-gradient(180deg,#ffe28f,#e8ad3a); color:#4a3406; cursor:pointer;
+    box-shadow:0 0 22px rgba(232,173,58,0.5); margin-bottom:14px; }
+  .ghost-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(90,67,21,0.75); color:var(--ink);
     padding:14px 26px; border-radius:24px; font-size:19px; font-weight:bold; cursor:pointer;
     box-shadow:0 2px 6px rgba(0,0,0,0.15); }
   .full-panel{ margin-top:16px; width:92%; max-width:420px; background:rgba(255,255,255,0.42);
-    border:1px solid rgba(122,36,24,0.3); border-radius:12px; padding:14px 16px; text-align:left; }
+    border:1px solid rgba(90,67,21,0.3); border-radius:12px; padding:14px 16px; text-align:left; }
   .full-text{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:17px; line-height:1.9; color:var(--ink); }
   .full-trans{ margin-top:10px; font-size:13px; line-height:1.7; color:var(--ink-soft); }
 
+  /* ---------- 遊戲畫面 ---------- */
   #game{ display:flex; flex-direction:column; align-items:center; padding-top:2vh; }
-  .progress-dots{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; max-width:280px; }
-  .progress-dots span{ width:9px; height:9px; border-radius:50%; background:rgba(122,36,24,0.2);
-    border:1px solid rgba(122,36,24,0.4); transition:background .4s; }
-  .progress-dots span.done{ background:#d9483a; box-shadow:0 0 8px rgba(217,72,58,0.7); }
+  .progress-dots{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; justify-content:center; max-width:260px; }
+  .progress-dots span{ width:9px; height:9px; border-radius:50%; background:rgba(90,67,21,0.2);
+    border:1px solid rgba(90,67,21,0.4); transition:background .4s; }
+  .progress-dots span.done{ background:#d99a2a; box-shadow:0 0 8px rgba(217,154,42,0.7); }
 
-  .window-scene{ position:relative; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; }
-  .window-scene::before{ content:''; position:absolute; top:10%; left:50%; width:240px; height:240px;
-    transform:translate(-50%,-30%); border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle, rgba(224,88,64,0.35), transparent 70%); z-index:-1; }
-  
-  .light-holder{ position:relative; width:40px; height:60px; margin-top:16px; flex-shrink:0;
-    filter:drop-shadow(0 0 var(--glow,8px) #ff9c88); transition:filter .6s; display:flex; align-items:center; justify-content:center; }
-  .light-holder .heart{ width:28px; height:26px; position:relative;
-    background:radial-gradient(circle at 35% 30%, #fff2e8, #ffa088 55%, #e05840 92%);
-    transform:rotate(-45deg); animation:beat 1.7s ease-in-out infinite; }
-  .light-holder .heart::before, .light-holder .heart::after{ content:''; position:absolute; width:28px; height:28px;
-    border-radius:50%; background:inherit; }
-  .light-holder .heart::before{ top:-14px; left:0; }
-  .light-holder .heart::after{ top:0; left:14px; }
-  @keyframes beat{ 0%,100%{ transform:rotate(-45deg) scale(1); } 50%{ transform:rotate(-45deg) scale(1.18); } }
-
+  .window-scene{ position:relative; display:flex; align-items:flex-start; justify-content:center; gap:6px; width:100%; }
+  .window-scene::before{ content:''; position:absolute; top:5%; left:50%; width:260px; height:260px;
+    transform:translate(-50%,-35%); border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, rgba(255,224,150,0.45), transparent 70%); z-index:-1; }
+  .light-holder{ position:relative; width:34px; height:78px; margin-top:12px; flex-shrink:0;
+    filter:drop-shadow(0 0 var(--glow,8px) #ffe28f); transition:filter .6s; display:flex; align-items:center; justify-content:center; }
+  .light-holder .rays{ position:absolute; width:60px; height:60px; left:50%; top:50%;
+    transform:translate(-50%,-50%); background:conic-gradient(from 0deg, transparent 0deg, rgba(255,220,140,0.55) 8deg, transparent 16deg,
+    transparent 40deg, rgba(255,220,140,0.55) 48deg, transparent 56deg,
+    transparent 80deg, rgba(255,220,140,0.55) 88deg, transparent 96deg,
+    transparent 120deg, rgba(255,220,140,0.55) 128deg, transparent 136deg,
+    transparent 160deg, rgba(255,220,140,0.55) 168deg, transparent 176deg,
+    transparent 200deg, rgba(255,220,140,0.55) 208deg, transparent 216deg,
+    transparent 240deg, rgba(255,220,140,0.55) 248deg, transparent 256deg,
+    transparent 280deg, rgba(255,220,140,0.55) 288deg, transparent 296deg,
+    transparent 320deg, rgba(255,220,140,0.55) 328deg, transparent 336deg);
+    animation:rayspin 12s linear infinite; border-radius:50%; }
+  @keyframes rayspin{ to{ transform:translate(-50%,-50%) rotate(360deg); } }
+  .light-holder .orb{ width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 38% 32%, #fffbe8, #ffdd8f 55%, #e8ad3a 90%);
+    animation:glow 2.2s ease-in-out infinite; position:relative; z-index:1; }
+  @keyframes glow{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.1); } }
 
   .window-frame{ position:relative; background:#f7dce0; border:3px solid #5c2430;
     border-radius:10px; padding:8px; width:100%; max-width:390px; box-shadow:0 6px 18px rgba(0,0,0,0.22); }
   .glass{ position:relative; background:var(--glass-bg); border-radius:6px; padding:14px 8px;
     min-height:70px; display:flex; align-items:center; justify-content:center; overflow:hidden;
-    box-shadow:inset 0 0 24px rgba(122,36,24,0.18); }
+    box-shadow:inset 0 0 24px rgba(140,105,40,0.18); }
     .glass.ripple::after{ content:none; position:absolute; inset:0; border-radius:6px;
     background:radial-gradient(circle, rgba(255,252,240,0.6), transparent 65%);
     animation:rippleAnim .55s ease-out; }
@@ -135,11 +144,11 @@
 
   .slots-row{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; align-items:center; }
   .slot{ width:calc(var(--char-size) + 16px); height:calc(var(--char-size) + 16px);
-    border:2.5px dashed rgba(122,36,24,0.85); border-radius:8px; display:flex; align-items:center;
+    border:2px dashed rgba(140,105,40,0.55); border-radius:8px; display:flex; align-items:center;
     justify-content:center; font-size:var(--char-size); font-weight:bold; color:var(--ink);
-    font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.82); }
-  .slot.filled{ border-style:solid; border-width:2.5px; border-color:#d9483a; color:var(--ink);
-    text-shadow:none; background:rgba(255,255,255,0.92); box-shadow:0 0 0 1px rgba(217,72,58,0.35) inset; }
+    font-family:"KaiTi","STKaiti","BiauKai",serif; background:rgba(255,255,255,0.3); }
+  .slot.filled{ border-style:solid; border-color:#d99a2a; color:#b5791a;
+    text-shadow:0 0 6px rgba(217,154,42,0.4); background:rgba(217,154,42,0.14); }
   .slot.hint-target{ animation:slotHintPulse 0.9s ease-in-out infinite;
     border-color:#f0a400 !important; border-style:solid !important; background:rgba(255,220,120,0.55) !important; }
   @keyframes slotHintPulse{ 0%,100%{ box-shadow:0 0 4px 2px rgba(240,164,0,0.55);} 50%{ box-shadow:0 0 20px 6px rgba(240,164,0,0.95);} }
@@ -172,44 +181,44 @@
   @keyframes popAway{ 0%{ transform:scale(1); opacity:1; } 60%{ transform:scale(1.35); opacity:1; } 100%{ transform:scale(0.2); opacity:0; } }
 
   .controls-row{ display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
-  .ctrl-btn{ padding:17px 24px; border:2px solid rgba(122,36,24,0.75); border-radius:24px;
+  .ctrl-btn{ padding:17px 24px; border:2px solid rgba(90,67,21,0.75); border-radius:24px;
     background:rgba(255,255,255,0.92); color:var(--ink); font-size:20px; font-weight:bold; cursor:pointer;
     box-shadow:0 2px 8px rgba(0,0,0,0.2); }
   .ctrl-btn.home-btn{ background:linear-gradient(180deg,#d6e6f0,#8fb4cc); border-color:rgba(16,40,56,0.55); color:#14303c; }
   .controls-row{ gap:9px; }
   .ctrl-btn{ padding:12px 17px; border-radius:18px; font-size:16px; }
 
+  /* ---------- 完成畫面：再玩一次／回首頁 放在最前面 ---------- */
   #finish{ text-align:center; padding-top:6vh; display:flex; flex-direction:column; align-items:center; }
-  .seal{ width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffd8cc, var(--seal-gold) 75%);
-    color:#3a1006; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold;
+  .seal{ width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff0c0, var(--seal-gold) 75%);
+    color:#4a3406; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:bold;
     font-family:"KaiTi","STKaiti","BiauKai",serif; letter-spacing:1px;
-    box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 4px 14px rgba(217,72,58,0.4); transform:scale(0);
+    box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 4px 14px rgba(180,130,20,0.4); transform:scale(0);
     animation:stampIn .5s cubic-bezier(.34,1.56,.64,1) forwards; margin-bottom:10px; }
   @keyframes stampIn{ to{ transform:scale(1); } }
-  #finish h2{ margin:2px 0 12px; font-size:18px; color:#c1341a; }
+  #finish h2{ margin:2px 0 12px; font-size:18px; color:#b5791a; }
   .final-poem{ font-family:"KaiTi","STKaiti","BiauKai",serif; font-size:18px; line-height:1.9; letter-spacing:1px;
     color:var(--ink); text-shadow:none; margin-bottom:8px; padding:0 6px; }
   .final-time{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
   .home-btn-row{ display:flex; gap:10px; margin-top:16px; width:92%; max-width:380px; }
   .home-btn-row button{ flex:1; padding:11px 6px; border:none; border-radius:8px; font-size:14px; font-weight:bold;
-    cursor:pointer; color:#3a1006; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
-  .start-btn{ background:linear-gradient(180deg,#ffb8a8,#d9483a); }
-  .translate-btn2{ background:linear-gradient(180deg,#ffb8a8,#e05840); }
+    cursor:pointer; color:#4a3406; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+  .start-btn{ background:linear-gradient(180deg,#ffe9b0,#e8ad3a); }
+  .translate-btn2{ background:linear-gradient(180deg,#ffdca0,#d9822a); }
   #toggleTransBtn{ margin-top:22px; }
 
-  .mute-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(122,36,24,0.6); color:var(--ink);
+  .mute-btn{ background:rgba(255,255,255,0.85); border:2px solid rgba(90,67,21,0.6); color:var(--ink);
     padding:12px 22px; border-radius:20px; font-size:17px; font-weight:bold; cursor:pointer; margin-top:6px; }
 
   [hidden]{ display:none !important; }
-
 </style>
 </head>
 <body>
 
 <div class="scene-bg" aria-hidden="true">
-  <div class="ambient-wrap" id="ambientWrap"></div>
-  <div class="sil sil-back"></div>
-  <div class="sil sil-front"></div>
+  <div class="ambient-light" id="ambientLight"></div>
+  <div class="clouds clouds-back"></div>
+  <div class="clouds clouds-front"></div>
 </div>
 
 <div id="timer">思考時間 00:00</div>
@@ -218,23 +227,25 @@
   <button onclick="adjustFont(1)" aria-label="放大字體">A+</button>
 </div>
 
+<!-- 首頁：天光降臨情境優先，文字精簡 -->
 <div id="home" class="page">
-  <p class="eyebrow">聖經記憶遊戲 · 神的愛向我們顯明</p>
-  <h1 class="poem-title">羅馬書 5:8</h1>
+  <p class="eyebrow">聖經記憶遊戲 · 領受從神而來的恩光</p>
+  <h1 class="poem-title">哥林多前書 2:12</h1>
   <p class="poet-line">新約 · 保羅的教導</p>
   <div class="preview-line" id="previewLine"></div>
-  <button class="candle-btn" onclick="enterGame()">❤️ 經歷大愛，開始拼經文</button>
+  <button class="candle-btn" onclick="enterGame()">✨ 領受恩光，開始拼經文</button>
   <button class="ghost-btn" onclick="toggleFull()">閱讀全文</button>
   <div id="fullPanel" class="full-panel" hidden>
-    <div class="full-text">「唯有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。」</div>
-    <div class="full-trans">羅馬書 5:8</div>
+    <div class="full-text">「我們所領受的，並不是世上的靈，乃是從神來的靈，叫我們能知道神開恩賜給我們的事。」</div>
+    <div class="full-trans">哥林多前書 2:12</div>
   </div>
 </div>
 
+<!-- 遊戲畫面：一次只看一小段 -->
 <div id="game" class="page" hidden>
   <div class="progress-dots" id="progressDots"></div>
   <div class="window-scene">
-    <div class="light-holder" id="candleHolder"><div class="heart"></div></div>
+    <div class="light-holder" id="candleHolder"><div class="rays"></div><div class="orb"></div></div>
     <div class="window-frame">
       <div class="glass" id="glass">
         <div id="slots" class="slots-row"></div>
@@ -251,10 +262,11 @@
   </div>
 </div>
 
+<!-- 完成畫面 -->
 <div id="finish" class="page" hidden>
-  <div class="seal">大愛</div>
-  <h2>經文拼寫完成，願你天天經歷這愛</h2>
-  <div class="final-poem">「唯有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。」</div>
+  <div class="seal">恩賜</div>
+  <h2>經文拼寫完成，願恩光常照亮你心</h2>
+  <div class="final-poem">「我們所領受的，並不是世上的靈，乃是從神來的靈，叫我們能知道神開恩賜給我們的事。」</div>
   <p class="final-time" id="finalTime"></p>
 
   <div class="home-btn-row">
@@ -266,37 +278,41 @@
   <br>
   <button class="mute-btn" onclick="stopNarration()">🔇 不想聽語音了</button>
   <div id="finalTransPanel" class="full-panel" hidden>
-    <div class="full-trans">願你天天記得，神的愛不是等你變好才給你，而是在你還軟弱的時候就已經顯明。<br>願這樣的愛，天天安慰你的心。</div>
+    <div class="full-trans">願從神來的靈，天天開啟你的心眼。<br>願你明白神所賜給你的恩典與美意，心裡滿有平安與感恩。</div>
   </div>
 </div>
 
 <script>
-
 (function(){
   "use strict";
 
+  // 以標點符號為界分段，讓每個語詞連在同一句唸出，語音才會唸對破音字與語意
   var lines = [
-    { chars:["唯","有","基","督"], punct:"" },
-      { chars:["在","我","們","還","作"], punct:"" },
-      { chars:["罪","人","的","時","候"], punct:"" },
-      { chars:["為","我","們","死"], punct:"，" },
-    { chars:["神","的","愛","就","在","此","向","我","們","顯","明","了"], punct:"。" }
+    { chars:["我","們","所","領","受","的"], punct:"，" },
+    { chars:["並","不","是","世","上","的","靈"], punct:"，" },
+    { chars:["乃","是","從","神","來","的","靈"], punct:"，" },
+    { chars:["叫","我","們","能","知","道","神","開","恩","賜","給","我","們","的","事"], punct:"。" }
   ];
 
-  var fullVerseSpeech = "唯有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。";
-  var blessingSpeech = "願你天天記得，神的愛不是等你變好才給你，而是在你還軟弱的時候就已經顯明。願這樣的愛，天天安慰你的心。";
+  // 聖經解釋見解多元，遊戲中不對經文逐段加註解釋——完成整段經文後，
+  // 只完整讀一次經文原文，再讀出這節經文的祝福話語。
+  var fullVerseSpeech = "我們所領受的，並不是世上的靈，乃是從神來的靈，叫我們能知道神開恩賜給我們的事。";
+  var blessingSpeech = "願從神來的靈，天天開啟你的心眼。願你明白神所賜給你的恩典與美意，心裡滿有平安與感恩。";
 
+  /* 選字物件統一使用單一深色（見 CSS .char-drop），只保留錯開的浮動節奏，
+     方便長輩辨識文字、不因顏色混雜而分心或看不清楚 */
   function styleDrop(el){
     el.style.animationDelay = (-Math.random() * 2.4).toFixed(2) + 's';
   }
 
   var currentLine = 0;
-  var activeCluster = null;
+  var activeCluster = null; // { element, chars }
   var seconds = 0, timerStarted = false, timerInterval = null, fallInterval = null;
   var fontLevel = 0;
 
-  function buildAmbient(){
-    var wrap = document.getElementById('ambientWrap');
+  /* ---------- 環境天光微塵（裝飾用，不可點擊） ---------- */
+  function buildAmbientLight(){
+    var wrap = document.getElementById('ambientLight');
     var n = 26;
     for (var i = 0; i < n; i++){
       var d = document.createElement('div');
@@ -310,6 +326,7 @@
     }
   }
 
+  /* ---------- 首頁：逐字浮現預覽句 ---------- */
   function buildPreview(){
     var el = document.getElementById('previewLine');
     var text = fullVerseSpeech;
@@ -322,6 +339,7 @@
     });
   }
 
+  /* ---------- 依經文段落數量動態產生進度點 ---------- */
   function buildProgressDots(){
     var wrap = document.getElementById('progressDots');
     wrap.innerHTML = '';
@@ -340,6 +358,7 @@
     p.hidden = !p.hidden;
   };
 
+  /* ---------- 字體大小 ---------- */
   window.adjustFont = function(dir){
     fontLevel = Math.max(0, Math.min(2, fontLevel + dir));
     var root = document.documentElement;
@@ -348,6 +367,7 @@
     if (fontLevel === 2) root.classList.add('font-xl');
   };
 
+  /* ---------- 計時器（低壓力，僅供自我記錄） ---------- */
   function formatTime(s){
     var m = Math.floor(s/60).toString().padStart(2,'0');
     var sec = (s%60).toString().padStart(2,'0');
@@ -366,6 +386,7 @@
     if (timerInterval) clearInterval(timerInterval);
   }
 
+  /* ---------- 頁面切換 ---------- */
   window.enterGame = function(){
     document.getElementById('home').hidden = true;
     document.getElementById('finish').hidden = true;
@@ -374,7 +395,7 @@
     seconds = 0; timerStarted = false;
     document.getElementById('timer').innerText = formatTime(seconds);
     buildProgressDots();
-    updateGlow(0);
+    updateCandleGlow(0);
     updateProgressDots();
     document.getElementById('slots').innerHTML = '';
     loadLine(0);
@@ -398,9 +419,10 @@
     try{ window.speechSynthesis.cancel(); }catch(e){}
   };
 
-  function updateGlow(doneCount){
+  /* ---------- 恩光：完成愈多段，光愈亮 ---------- */
+  function updateCandleGlow(doneCount){
     var holder = document.getElementById('candleHolder');
-    var glow = 8 + doneCount * 7;
+    var glow = 8 + doneCount * 7; // 8..50
     holder.style.setProperty('--glow', glow + 'px');
   }
   function updateProgressDots(){
@@ -410,6 +432,7 @@
     });
   }
 
+  /* ---------- 載入一段：只顯示這一段的空格 ---------- */
   function loadLine(idx){
     var line = lines[idx];
     var slotsDiv = document.getElementById('slots');
@@ -431,6 +454,7 @@
       slotsDiv.appendChild(punct);
     }
 
+    // 每出現一段經文，先唸一次給長輩聽，再開始選字
     speakInterrupt(line.chars.join('') + line.punct);
 
     var shuffled = line.chars.slice().sort(function(){ return Math.random() - 0.5; });
@@ -446,6 +470,7 @@
     }, 90);
   }
 
+  /* ---------- 依字數動態調整掉落區高度，避免段落較長時字卡被裁切 ---------- */
   function computeZoneHeight(count){
     var cs = getComputedStyle(document.documentElement);
     var charSize = parseFloat(cs.getPropertyValue('--char-size')) || 24;
@@ -459,6 +484,7 @@
     return Math.max(120, h);
   }
 
+  /* ---------- 產生浮現的字卡（單一段） ---------- */
   function spawnCluster(chars){
     var zone = document.getElementById('dropZone');
     zone.innerHTML = '';
@@ -491,7 +517,7 @@
     if (fallInterval) clearInterval(fallInterval);
     fallInterval = setInterval(function(){
       if (currentY < targetY){
-        currentY += 2;
+        currentY += 2; // 放慢下降速度，減少緊迫感
         cluster.style.top = currentY + 'px';
       } else {
         clearInterval(fallInterval);
@@ -538,9 +564,10 @@
     activeCluster = null;
 
     var line = lines[currentLine];
+    // 不顯示逐段解釋文字，避免對經文做出可能有爭議的解讀
 
     currentLine++;
-    updateGlow(currentLine);
+    updateCandleGlow(currentLine);
     updateProgressDots();
 
     var isLast = currentLine >= lines.length;
@@ -551,6 +578,7 @@
     });
   }
 
+  /* ---------- 更正：把最後一個填入的字還給字卡群 ---------- */
   window.undoLast = function(){
     var filled = document.querySelectorAll('#slots .slot.filled[data-line="' + currentLine + '"]');
     if (filled.length === 0) return;
@@ -584,6 +612,7 @@
     });
   }
 
+  /* ---------- 提示：讓下一格微微發光，不直接洩題 ---------- */
   window.giveHint = function(){
     var banner = document.getElementById('hintBanner');
     var bannerText = document.getElementById('hintBannerText');
@@ -600,6 +629,10 @@
     }, 10000);
   };
 
+  /* ---------- 語音 ----------
+     speak(text, onDone)：唸完（或逾時、或不支援語音）才會呼叫 onDone，
+     確保「太棒了」等收尾語音不會搶在上一句話唸完前插進來。
+     speakInterrupt(text)：給使用者主動按按鈕，或新段落出現時用，會先打斷目前語音。 */
   function speak(text, onDone){
     var done = false;
     function finish(){
@@ -634,6 +667,7 @@
     }
   };
 
+  /* ---------- 完成整節經文：天光更明亮，恭喜語之後完整讀一次經文，再讀出祝福 ---------- */
   function finishGame(){
     stopTimer();
     document.getElementById('game').hidden = true;
@@ -646,7 +680,7 @@
         particleCount: 140,
         spread: 90,
         origin: { y: 0.55 },
-        colors: ["#ffb8a8","#fff6c8","#ffd8cc","#d9483a"]
+        colors: ['#ffe9b0','#fff6c8','#ffdc90','#e8ad3a']
       });
     }
 
@@ -663,10 +697,11 @@
     });
   }
 
-  buildAmbient();
+  /* ---------- 初始化 ---------- */
+  buildAmbientLight();
   buildPreview();
 })();
-
 </script>
+
 </body>
 </html>
